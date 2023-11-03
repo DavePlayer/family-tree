@@ -1,3 +1,48 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+* {
+    font-family: Inter;
+}
+
+.bg-gradient {
+    background: linear-gradient(90deg, #fd7900 -0.88%, #f33 48.31%, #ff00e5 100%);
+}
+
+.login-title {
+    @apply text-2xl font-bold;
+}
+
+.login-subtitle {
+    @apply text-justify;
+}
+
+.logo-text {
+    @apply font-island-moment;
+}
+
+.register-button {
+    @apply rounded-lg border-[1px] border-error text-error px-11 py-2 hover:text-error-hover hover:border-error-hover transition-colors duration-100;
+}
+.gradient-button:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #ff00e5 0.88%, #f33 48.31%, #fd7900 100%);
+    transition: opacity 0.4s;
+    opacity: 0;
+    z-index: -1;
+}
+.gradient-button:hover::before {
+    opacity: 1;
+}
+.gradient-button {
+    @apply bg-gradient text-gradient-text p-2 mt-4 rounded-3xl relative z-[1] overflow-hidden;
+}
+
+input {
+    @apply p-2 bg-transparent text-default-color rounded-3xl pl-4 border-[1px];
+}
