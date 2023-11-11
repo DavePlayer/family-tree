@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\family_tree_API.props" />
+</Project>
