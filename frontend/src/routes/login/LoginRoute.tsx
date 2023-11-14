@@ -44,7 +44,8 @@ export const LoginRoute = () => {
     const handleSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
         if (handlePassword() && handleEmailSyntax()) {
-            return console.log(loginData);
+            console.log(loginData);
+            return navigate("/trees");
         }
         toast.error("invalid login data");
     };
@@ -59,7 +60,7 @@ export const LoginRoute = () => {
                     <Logo />
                     <form action="#" className="w-full">
                         <p className="mt-10 mb-5 text-lg">Please login to your account</p>
-                        <p className="w-full pl-4 text-error text-sm">{emailError}</p>
+                        <p className="w-full mb-1 pl-4 text-error text-sm">{emailError}</p>
                         <input
                             className="w-full mb-4"
                             type="email"
@@ -69,7 +70,7 @@ export const LoginRoute = () => {
                             onChange={(e) => handleForm(e)}
                             onBlur={() => handleEmailSyntax()}
                         />
-                        <p className="w-full pl-4 text-error text-sm">{passError}</p>
+                        <p className="w-full mb-1 pl-4 text-error text-sm">{passError}</p>
                         <input
                             className="w-full"
                             type="password"

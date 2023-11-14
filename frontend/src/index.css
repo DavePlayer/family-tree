@@ -5,6 +5,22 @@
     font-family: Inter;
 }
 
+.no-tap {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+    pointer-events: none;
+}
+
 .bg-gradient {
     background: linear-gradient(90deg, #fd7900 -0.88%, #f33 48.31%, #ff00e5 100%);
 }
@@ -19,6 +35,21 @@
 
 .logo-text {
     @apply font-island-moment;
+}
+
+.button {
+    @apply rounded-lg border-[1px] px-8 py-2 text-sm;
+}
+.button.orange {
+    @apply border-orange text-orange hover:text-orange-hover hover:border-orange-hover transition-colors duration-100;
+}
+
+.title {
+    @apply text-3xl font-thin;
+}
+
+.title.big {
+    @apply text-6xl;
 }
 
 .register-button {
@@ -45,4 +76,25 @@
 
 input {
     @apply p-2 bg-transparent text-default-color rounded-3xl pl-4 border-[1px];
+}
+
+.header {
+    @apply bg-dark-1 fixed top-0 left-0 text-default-color p-3 w-full flex justify-between items-center;
+}
+
+.popup-content {
+    @apply m-auto bg-dark-3 w-1/2 p-[5px] py-10 text-default-color;
+}
+.popup-arrow {
+    color: rgb(255, 255, 255);
+}
+[role="tooltip"].popup-content {
+    width: 200px;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 0px 3px;
+}
+.popup-overlay {
+    background: rgba(0, 0, 0, 0.6);
+}
+[data-popup="tooltip"].popup-overlay {
+    background: transparent;
 }
