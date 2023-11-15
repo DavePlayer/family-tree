@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 import DownloadIcon from "./../../assets/download.svg?react";
 import CloseIcon from "./../../assets/close.svg?react";
+import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { createNewTree } from "../../redux/slices/treesSlice/cases/tests/createNewTree";
+import { AppDispatch } from "../../redux/store";
 
 export const CreateNewTree: React.FC<{ close: () => void }> = ({ close }) => {
+    const dispatch = useDispatch<AppDispatch>();
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [name, setName] = useState("");
     const handleFile = (file: File) => {
@@ -13,6 +18,15 @@ export const CreateNewTree: React.FC<{ close: () => void }> = ({ close }) => {
     const handleForm = (e: React.ChangeEvent<HTMLInputElement>) => {
         setName(e.target.value);
     };
+
+    const handleCrateTree = () => {
+        if (selectedFile && name.length > 0) {
+            return dispatch(createNewTree({ name: name, imgUrl: URL.createObjectURL(selectedFile) }))
+                .then(() => close())
+                .catch(() => { })
+        }
+        return toast.error("not enough data provided")
+    }
 
     return (
         <div className="modal relative">
@@ -68,7 +82,7 @@ export const CreateNewTree: React.FC<{ close: () => void }> = ({ close }) => {
                     placeholder="tree name"
                     className="mt-5 text-center w-1/2"
                 />
-                <button className="gradient-button w-1/2">Create Tree</button>
+                <button onClick={() => handleCrateTree()} className="gradient-button w-1/2">Create Tree</button>
             </div>
         </div>
     );

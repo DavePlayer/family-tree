@@ -24,7 +24,7 @@ export const fetchTrees = createAsyncThunk(
                 if (true) {
                     res(exampleTree);
                 }
-                rej(new Error("not working lol"));
+                rej(new Error("test promise error"));
             }, 1000);
         })
 );

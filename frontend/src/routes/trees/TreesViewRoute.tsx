@@ -10,7 +10,6 @@ export const TreesViewRoute = () => {
     const dispatch = useDispatch<AppDispatch>();
     const [popupOpen, setPopupOpen] = useState(false);
     useEffect(() => {
-        console.log("help pls");
         dispatch(fetchTrees());
     }, [dispatch]);
     return (
@@ -47,11 +46,11 @@ export const TreesViewRoute = () => {
                     trees.map((tree) => {
                         return (
                             <article className="w-1/5 rounded-3xl overflow-hidden cursor-pointer">
-                                <figure className="max-h-[10rem] overflow-hidden rounded-3xl">
+                                <figure className="h-[10rem] overflow-hidden rounded-3xl flex justify-center">
                                     <img
                                         src={tree.imgUrl}
                                         alt="background"
-                                        className="w-full block no-tap"
+                                        className="h-full max-w-none block no-tap"
                                     />
                                 </figure>
                                 <p className="w-full text-center no-tap">{tree.name}</p>

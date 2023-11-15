@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { Id, toast } from "react-toastify";
 import { fetchTrees } from "./cases/tests/fetchTrees.ts";
+import { createNewTree } from "./cases/tests/createNewTree.ts";
 
 // Define a type for the slice state
 export interface Tree {
@@ -64,6 +65,43 @@ export const treesSlice = createSlice({
             if (state.toastId)
                 toast.update(state.toastId, {
                     render: "failed to get trees",
+                    type: "error",
+                    isLoading: false,
+                    autoClose: 2000,
+                });
+            console.error(`${payload.error.code}: ${payload.error.message}`);
+        });
+
+
+
+        // ---------------------
+        // Create new Tree
+        // ---------------------
+        builder.addCase(createNewTree.pending, (state) => {
+            console.log("pending trees from thunk");
+            state.toastId = toast.loading("fetching family trees", {
+                autoClose: 5000,
+                closeButton: true,
+                closeOnClick: true,
+                toastId: "yoMama",
+            });
+            state.status = status.loading;
+        });
+        builder.addCase(createNewTree.fulfilled, (state, action) => {
+            state.status = status.loaded;
+            if (state.toastId)
+                toast.update(state.toastId, {
+                    render: "createdNewTree",
+                    type: "success",
+                    isLoading: false,
+                    autoClose: 2000,
+                });
+            state.familyTrees = [...state.familyTrees, action.payload];
+        });
+        builder.addCase(createNewTree.rejected, (state, payload) => {
+            if (state.toastId)
+                toast.update(state.toastId, {
+                    render: "failed to craete new tree",
                     type: "error",
                     isLoading: false,
                     autoClose: 2000,
