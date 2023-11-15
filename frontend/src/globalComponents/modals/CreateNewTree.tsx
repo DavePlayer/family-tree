@@ -22,7 +22,7 @@ export const CreateNewTree: React.FC<{ close: () => void }> = ({ close }) => {
     const handleCrateTree = () => {
         if (selectedFile && name.length > 0) {
             return dispatch(createNewTree({ name: name, imgUrl: URL.createObjectURL(selectedFile) }))
-                .then(() => close())
+                .then((a) => a.meta.requestStatus != 'rejected' && close())
                 .catch(() => { })
         }
         return toast.error("not enough data provided")
