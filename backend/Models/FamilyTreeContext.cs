@@ -145,7 +145,6 @@ public partial class FamilyTreeContext : DbContext
             entity.ToTable("users");
 
             entity.Property(e => e.Id)
-                .ValueGeneratedNever()
                 .HasColumnName("id");
             entity.Property(e => e.EMail)
                 .HasMaxLength(40)
@@ -154,7 +153,7 @@ public partial class FamilyTreeContext : DbContext
                 .HasMaxLength(40)
                 .HasColumnName("name");
             entity.Property(e => e.Password)
-                .HasMaxLength(40)
+                .HasMaxLength(256)
                 .HasColumnName("password");
         });
 
