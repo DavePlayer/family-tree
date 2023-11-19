@@ -6,6 +6,7 @@ using family_tree_API.Services;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Identity;
+using family_tree_API;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,19 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddAuthentication().AddJwtBearer();
+
+
+
+var authenticationSettings = new AuthenticationSettings();
+//builder.Configuration.GetSection("Authentication").Bind(authenticationSettings);
+//builder.Services.AddAuthentication(option =>
+//{
+//    option.DefaultAuthenticateScheme = "Bearer";
+//    option.DefaultScheme = "Bearer";
+//    option.DefaultChallengeScheme = "Bearer";
+//}).AddJwtBearer
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();

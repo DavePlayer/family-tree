@@ -1,24 +1,38 @@
 ﻿using family_tree_API.Dto;
+using family_tree_API.Exceptions;
 using family_tree_API.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace family_tree_API.Services
 {
-    public interface IAccountService {
-
+    public interface IAccountService
+    {
         void RegisterUser(RegisterUserDto dto);
+
+        string GenerateJwt(LoginDto dto);
     }
+
     public class AccountService : IAccountService
     {
         private readonly FamilyTreeContext _context;
         private readonly IPasswordHasher<User> _passwordHasher;
-        public AccountService(FamilyTreeContext context, IPasswordHasher<User> passwordHasher)
+        private readonly IConfiguration _configuration;
+
+        public AccountService(FamilyTreeContext context, IPasswordHasher<User> passwordHasher, IConfiguration configuration)
         {
             _context = context;
             _passwordHasher = passwordHasher;
+            _configuration = configuration;
         }
-        public void RegisterUser(RegisterUserDto dto) {
-            var newUser = new User() { 
+
+        public void RegisterUser(RegisterUserDto dto)
+        {
+            var newUser = new User()
+            {
                 EMail = dto.Email,
                 Name = dto.Name,
                 Password = dto.Password,
@@ -27,7 +41,39 @@ namespace family_tree_API.Services
             newUser.Password = hashedPassword;
             _context.Users.Add(newUser);
             _context.SaveChanges();
+        }
 
+        string IAccountService.GenerateJwt(LoginDto dto)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.EMail == dto.Email);
+            if (user == null)
+            {
+                throw new BadRequestException("Invalid user name or password"); //tutaj brakuje implementacji tego wyjatkowu jkos sensowniej
+            }
+
+            var resault = _passwordHasher.VerifyHashedPassword(user, user.Password, dto.Password);
+            if (resault == PasswordVerificationResult.Failed)
+            {
+                throw new BadRequestException("Invalid user name or password");
+            }
+
+            var claims = new List<Claim>() {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Name)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("JwtSettings:Token").Value!));
+            var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+            var token = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.Now.AddDays(1),
+                signingCredentials: cred
+            );
+
+
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+            return jwt;
         }
     }
 }
