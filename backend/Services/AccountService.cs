@@ -48,13 +48,13 @@ namespace family_tree_API.Services
             var user = _context.Users.FirstOrDefault(u => u.EMail == dto.Email);
             if (user == null)
             {
-                throw new BadRequestException("Invalid user name or password"); //tutaj brakuje implementacji tego wyjatkowu jkos sensowniej
+                throw new BadRequestException("Invalid user name or password", new Exception());
             }
 
             var resault = _passwordHasher.VerifyHashedPassword(user, user.Password, dto.Password);
             if (resault == PasswordVerificationResult.Failed)
             {
-                throw new BadRequestException("Invalid user name or password");
+                throw new BadRequestException("Invalid user name or password", new Exception());
             }
 
             var claims = new List<Claim>() {

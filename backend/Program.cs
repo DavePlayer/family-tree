@@ -1,12 +1,14 @@
+using family_tree_API;
 using family_tree_API.Dto;
 using family_tree_API.Dto.Validators;
-using Microsoft.EntityFrameworkCore;
+using family_tree_API.Exceptions;
+using family_tree_API.Middleware;
 using family_tree_API.Models;
 using family_tree_API.Services;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Identity;
-using family_tree_API;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,30 +21,25 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddAuthentication().AddJwtBearer();
 
-
-
 var authenticationSettings = new AuthenticationSettings();
-//builder.Configuration.GetSection("Authentication").Bind(authenticationSettings);
-//builder.Services.AddAuthentication(option =>
-//{
-//    option.DefaultAuthenticateScheme = "Bearer";
-//    option.DefaultScheme = "Bearer";
-//    option.DefaultChallengeScheme = "Bearer";
-//}).AddJwtBearer
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddDbContext<FamilyTreeContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("familyTreeContext")));
+builder.Services.AddScoped<ErrorHandlingMiddleware>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
