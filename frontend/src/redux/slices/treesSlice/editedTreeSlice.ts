@@ -59,7 +59,7 @@ export const treesSlice = createSlice({
         // ---------------------
         builder.addCase(fetchEditerTreeData.pending, (state) => {
             console.log("pending trees from thunk");
-            state.toastId = toast.loading("fetching family trees", {
+            state.toastId = toast.loading("fetching Tree Data to Edit", {
                 autoClose: 5000,
                 closeButton: true,
                 closeOnClick: true,
@@ -68,7 +68,13 @@ export const treesSlice = createSlice({
             state.status = status.loading;
         });
         builder.addCase(fetchEditerTreeData.fulfilled, (state, action) => {
+            // redo cause errors
             state.status = status.loaded;
+            const newState = {
+                ...state,
+                status: status.loaded,
+                ...action.payload,
+            };
             if (state.toastId)
                 toast.update(state.toastId, {
                     render: "fetched tree",
@@ -76,10 +82,7 @@ export const treesSlice = createSlice({
                     isLoading: false,
                     autoClose: 2000,
                 });
-            state = {
-                ...state,
-                ...action.payload,
-            };
+            return newState;
         });
         builder.addCase(fetchEditerTreeData.rejected, (state, payload) => {
             if (state && state.toastId)

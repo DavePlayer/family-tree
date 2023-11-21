@@ -8,6 +8,7 @@ export default {
                 gradient: "linear-gradient(90deg, #FD7900 0.88%, #F33 48.31%, #FF00E5 100%)",
                 "gradient-text": "#fff",
                 "default-color": "#fff",
+                "secondary-color": "#000",
                 error: "#FF6C6C",
                 "error-hover": "#ff4f4f",
                 "dark-1": "#00000033",

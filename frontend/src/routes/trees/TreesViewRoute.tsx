@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { fetchTrees } from "../../redux/slices/treesSlice/cases/tests/fetchTrees.ts";
 import Popup from "reactjs-popup";
 import { CreateNewTree } from "../../globalComponents/modals/CreateNewTree.tsx";
+import { Link } from "react-router-dom";
 
 export const TreesViewRoute = () => {
     const { familyTrees: trees } = useSelector((root: RootState) => root.trees);
@@ -45,16 +46,18 @@ export const TreesViewRoute = () => {
                 {trees.length > 0 ? (
                     trees.map((tree) => {
                         return (
-                            <article key={tree.id} className="w-1/5 rounded-3xl overflow-hidden cursor-pointer">
-                                <figure className="h-[10rem] overflow-hidden rounded-3xl flex justify-center">
-                                    <img
-                                        src={tree.imgUrl}
-                                        alt="background"
-                                        className="h-full max-w-none block no-tap"
-                                    />
-                                </figure>
-                                <p className="w-full text-center no-tap">{tree.name}</p>
-                            </article>
+                            <Link to={`/trees/${tree.id}`} className="w-1/5">
+                                <article key={tree.id} className="w-full rounded-3xl overflow-hidden cursor-pointer">
+                                    <figure className="h-[10rem] overflow-hidden rounded-3xl flex justify-center">
+                                        <img
+                                            src={tree.imgUrl}
+                                            alt="background"
+                                            className="h-full max-w-none block no-tap"
+                                        />
+                                    </figure>
+                                    <p className="w-full text-center no-tap">{tree.name}</p>
+                                </article>
+                            </Link>
                         );
                     })
                 ) : (

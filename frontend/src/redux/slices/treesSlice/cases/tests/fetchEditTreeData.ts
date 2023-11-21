@@ -2,16 +2,22 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { EditedTree } from "../../editedTreeSlice";
 import { Tree } from "../../treeSlice";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../../store";
 
 export const fetchEditerTreeData = createAsyncThunk(
     "trees/fetchEditedTree",
-    async (tree: Tree) =>
+    async (treeId: number) =>
         new Promise<Omit<EditedTree, "status">>((res, rej) => {
             console.log("thunk running");
             setTimeout(() => {
                 if (true) {
                     res({
-                        tree: tree,
+                        tree: {
+                            id: treeId,
+                            name: "test tree",
+                            imgUrl: ""
+                        },
                         nodes: [
                             {
                                 id: 1,
