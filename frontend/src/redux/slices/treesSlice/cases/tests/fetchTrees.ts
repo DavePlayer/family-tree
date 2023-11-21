@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Tree } from "../../treeSlice.ts";
+import * as d3 from "d3";
 
 const exampleTree: Array<Tree> = [
     {
