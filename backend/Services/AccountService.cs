@@ -63,9 +63,11 @@ namespace family_tree_API.Services
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("JwtSettings:Token").Value!));
-            var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+            var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
+                "issuer",
+                "audience",
                 claims: claims,
                 expires: DateTime.Now.AddDays(1),
                 signingCredentials: cred
