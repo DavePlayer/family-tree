@@ -1,6 +1,11 @@
 ﻿using family_tree_API.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using family_tree_API.Services;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.Options;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Query.Expressions.Internal;
+using System.Security.Claims;
 
 namespace family_tree_API.Controllers
 {
@@ -9,43 +14,35 @@ namespace family_tree_API.Controllers
     [Authorize]
     public class ImageController : Controller
     {
-        public ImageController() { }
-
-        
-        [HttpPost("test")]
-        public ActionResult Test() {
-            return Ok();   
-        }
-
-        [HttpPost("upload")]
-        public ActionResult Upload([FromForm] IFormFile file)
+        private readonly IImageService _imageService;
+        public ImageController(IImageService imageService)
         {
-            if (file != null && file.Length > 0)
-            {
-                var rootPath = Directory.GetCurrentDirectory();
-                var fileName = file.FileName;
-                var fullPath = $"{rootPath}/PrivateFiles/{fileName}";
-                using (var stream = new FileStream(fullPath, FileMode.Create))
-                {
-                    file.CopyTo(stream);
-                }
-
-                return Ok();
-            }
-
-            return Ok();
+            _imageService = imageService;
         }
+
+
+        [HttpGet("get_tree_images_url")]
+        public IActionResult trees_images()
+        {
+
+            return Json(_imageService.TreesImages()); //tutaj przekaze id kto pyta o to  
+        }
+
+        [HttpGet("get_members_images_url")]
+        public IActionResult members_images()
+        {
+            return Json(_imageService.MembersImages());
+        }
+
        
-        [HttpGet("get_urls")]
-        public IActionResult GetImageUrls()
+        [HttpPost("uploadimage")]
+        public async Task<IActionResult> OnPostUploadAsync(IFormFile file, string Id)
         {
-            return Ok();
+            
+            return Json(_imageService.Upload(file, Id));
+            
         }
 
-        [HttpDelete("delete_image")]
-        public IActionResult DeleteImage()
-        {
-            return Ok();
-        }
+
     }
 }

@@ -10,6 +10,7 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -44,9 +45,20 @@ builder.Services.AddAuthentication(option =>
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddDbContext<FamilyTreeContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("familyTreeContext")));
 builder.Services.AddScoped<ErrorHandlingMiddleware>();
+builder.Services.AddScoped<StaticFileAuthorizationMiddleware>();
+builder.Services.AddCors(options => {
+    options.AddPolicy("CorsPolicy", builder =>
+    {
+        builder
+        .AllowAnyHeader()
+        .AllowAnyOrigin();
+    });
+});
 
 var app = builder.Build();
 
@@ -56,13 +68,22 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseCors("CorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<StaticFileAuthorizationMiddleware>();
+app.UseStaticFiles(
+   new StaticFileOptions()
+   {
+       FileProvider = new PhysicalFileProvider(Path.Combine(Environment.CurrentDirectory, @"assets")),
+       RequestPath = "/assets"
+   }
+);
 
 
 app.MapControllers();

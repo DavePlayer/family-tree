@@ -1,0 +1,97 @@
+using family_tree_API.Dto;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.Options;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Query.Expressions.Internal;
+using System.Security.Claims;
+
+namespace family_tree_API.Controllers
+{
+    [ApiController]
+    [Route("file")]
+    //[Authorize]
+    public class ImageController : Controller
+    {
+        public ImageController() { }
+
+        
+        [HttpPost("test")]
+        public ActionResult Test() {
+            //var identity = HttpContext.User.Identity as ClaimsIdentity;
+            //var user_id = identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value; //tak pobieramy id uzytkowniko z claimu
+            //var user_name = identity?.FindFirst(ClaimTypes.Name)?.Value;
+            //return Ok(user_id + user_name);   
+
+
+
+            return Ok();
+        }
+
+        [HttpPost("upload")]
+        public ActionResult Upload([FromForm] IFormFile file)
+        {
+            if (file != null && file.Length > 0)
+            {
+                var rootPath = Directory.GetCurrentDirectory();
+                var fileName = file.FileName;
+                var fullPath = $"{rootPath}/PrivateFiles/{fileName}";
+                using (var stream = new FileStream(fullPath, FileMode.Create))
+                {
+                    file.CopyTo(stream);
+                }
+
+                return Ok();
+            }
+
+            return Ok();
+        }
+       
+        [HttpGet("getfile")]
+        public IActionResult image()
+        {
+            var rootPath = Directory.GetCurrentDirectory() ;
+            var filePath = $"{rootPath}\\Images\\text";
+
+            var fileExists = System.IO.File.Exists(filePath);
+            if (!fileExists)
+            {
+                return NotFound(filePath);
+            }
+
+            var contentProvider = new FileExtensionContentTypeProvider();
+            contentProvider.TryGetContentType(filePath, out var contentType);
+
+            var fileContents = System.IO.File.ReadAllText(filePath);
+
+
+            return File(fileContents, contentType);
+
+
+
+            return Ok();
+        }
+
+        [HttpDelete("delete_image")]
+        public IActionResult DeleteImage()
+        {
+            return Ok();
+        }
+
+        [HttpGet("file_url")] 
+        public PhysicalFileResult OnGet(string name ) {
+            var rootPath = Directory.GetCurrentDirectory();
+            var filePath = $"{rootPath}\\Images\\{name}.png";
+
+            return PhysicalFile(filePath, "image/jpeg");
+        }
+
+        [HttpGet("zestack")]
+        public IActionResult DisplayImage(string name)
+        {
+            var rootPath = Directory.GetCurrentDirectory();
+            var pathToImage = $"{rootPath}\\Images\\{name}.png";
+            return new FileStreamResult(new FileStream(pathToImage, FileMode.Open, FileAccess.Read), "image/png");
+        }
+    }
+}
