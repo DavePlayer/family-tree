@@ -1,0 +1,38 @@
+﻿using family_tree_API.Models;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+
+namespace family_tree_API.Services
+{
+    public interface IDataService {
+        List<FamilyTree> UserFamilyTrees();
+        List<FamilyMember> UserFamilyMembers();
+    }
+    public class DataService : IDataService
+    {
+        private readonly FamilyTreeContext _context;
+        private readonly IHttpContextAccessor _contextAccessor;
+        public DataService(FamilyTreeContext context, IHttpContextAccessor contextAccessor)
+        {
+            _context = context;
+            _contextAccessor = contextAccessor;
+        }
+
+        List<FamilyTree> IDataService.UserFamilyTrees()
+        {    
+            string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            List<FamilyTree> UserFamilyTrees = _context.FamilyTrees.Where(tree => tree.UserId.ToString() == userId).ToList();
+            return UserFamilyTrees;
+        }
+
+        List<FamilyMember> IDataService.UserFamilyMembers()
+        {
+            string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            List<FamilyMember> UserFamilyMembers = _context.FamilyMembers.Where(tree => tree.UserId.ToString() == userId).ToList();
+            return UserFamilyMembers;
+        }
+
+
+
+    }
+}

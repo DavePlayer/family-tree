@@ -1,38 +1,32 @@
 ﻿using family_tree_API.Exceptions;
+using family_tree_API.Migrations;
 using family_tree_API.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Security.Claims;
 
 namespace family_tree_API.Services
 {
     public interface IImageService
     {
-        List<string> TreesImages();
-        List<string> MembersImages();
-
-        string Upload(IFormFile files, string tosaveid);
+        Task<string> Upload(IFormFile files, string tosaveid);
     }
     public class ImageService : IImageService
     {
         private readonly FamilyTreeContext _context;
         private readonly IHttpContextAccessor _contextAccessor;
+        
         public ImageService(FamilyTreeContext context, IHttpContextAccessor contextAccessor)
         {
             _context = context;
             _contextAccessor = contextAccessor;
         }
-        List<string> IImageService.TreesImages()
-        {
-            throw new NotImplementedException();
-        }
-        List<string> IImageService.MembersImages()
-        {
-            throw new NotImplementedException();
-        }
+        
 
-        string IImageService.Upload(IFormFile file, string toSaveId)
+        async Task<string> IImageService.Upload(IFormFile file, string toSaveId)
         {
             //TO DO 
-            // jesli uploaduje zdjecie dla tego samego elementu, ale rozszerznie jest inne to nie nadpisuje
+
 
             // id famili membersa ktory jest w bazie do testow 8e341e16-57ef-42d6-a879-590689f18e2b
 
@@ -47,25 +41,23 @@ namespace family_tree_API.Services
             if (fileExtension != ".png" && fileExtension != ".jpg")
             {
                 _contextAccessor.HttpContext.Response.StatusCode = 415;
-                 
-                return("Supported: jpg, png");
-                
+
+                return ("Supported: jpg, png");
+
             }
 
 
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             //string userId = "2e3a4178-c4a6-4e66-9ecf-0bbc79d15404"; //only for testing 
 
-            bool isFamilyMemberOrTreeAssigned = _context.FamilyMembers
-        .Any(fm => fm.UserId.ToString() == userId && fm.Id.ToString() == toSaveId); // jesli probujemy przypisac zdjecie o id familimembersa lub famili tree ktorych uzytkownik nie jest wlascicielem
+            bool isFamilyMemberAssigned = _context.FamilyMembers
+            .Any(fm => fm.UserId.ToString() == userId && fm.Id.ToString() == toSaveId); // jesli probujemy przypisac zdjecie o id familimembersa lub famili tree ktorych uzytkownik nie jest wlascicielem
 
-            if (!isFamilyMemberOrTreeAssigned)
-            {
-                isFamilyMemberOrTreeAssigned = _context.FamilyTrees
+            bool isFamilyTreeAssigned = _context.FamilyTrees
             .Any(ft => ft.UserId.ToString() == userId && ft.Id.ToString() == toSaveId);
-            }
 
-            if (!isFamilyMemberOrTreeAssigned) // check that user can upload a image with this id
+            // check that user can upload a image with this id
+            if (!(isFamilyMemberAssigned || isFamilyTreeAssigned))
             {
                 throw new BadRequestException(
                     "Can't sign this image to this user, image id: " + toSaveId + "user id: " + userId,
@@ -73,20 +65,32 @@ namespace family_tree_API.Services
             }
 
 
-
+            
 
             //Find path
-            
             var fileDirectoryPath = Path.Combine(Environment.CurrentDirectory, @"assets", userId);
             var filePath = Path.Combine(fileDirectoryPath, toSaveId + fileExtension);
-            
+
+            //Create a catalog if the user has not uploaded a photo
             if (!Directory.Exists(fileDirectoryPath))
             {
                 Directory.CreateDirectory(fileDirectoryPath);
             }
 
 
+            if (isFamilyTreeAssigned)
+            {
+                await addImageUrlToTrees(toSaveId, @"assets" + "/" + userId + "/" + toSaveId + fileExtension);
+            }
+            else if (isFamilyMemberAssigned)
+            {
+                await addImageUrlToMembers(toSaveId, @"assets" + "/" + userId + "/" + toSaveId + fileExtension);
+            }
 
+
+
+
+            // deleting image with diffrent extension than is send
             if (fileExtension == ".png")
             {
                 if (File.Exists(Path.Combine(fileDirectoryPath, toSaveId + ".jpg")))
@@ -95,7 +99,8 @@ namespace family_tree_API.Services
                 }
 
             }
-            else {
+            else
+            {
                 if (File.Exists(Path.Combine(fileDirectoryPath, toSaveId + ".png")))
                 {
                     File.Delete((Path.Combine(fileDirectoryPath, toSaveId + ".png")));
@@ -103,18 +108,14 @@ namespace family_tree_API.Services
 
             }
 
-
-            List<string> resault = new List<string>();
-
+            //saving file
             if (file.Length > 0)
             {
-
                 using (var stream = System.IO.File.Create(filePath))
                 {
                     try
                     {
-                        file.CopyTo(stream);
-                        //mozna cos pogombinowa z CopyToAsync
+                        file.CopyTo(stream);//mozna cos pogombinowa z CopyToAsync
                     }
                     catch (Exception ex)
                     {
@@ -125,7 +126,46 @@ namespace family_tree_API.Services
                 }
             }
 
-            return (Path.Combine(userId, toSaveId));
+            return (userId + "/" + toSaveId);
+        }
+
+        private async Task<int> addImageUrlToMembers(string memberId, string imgUrl) {
+
+            var member = await _context.FamilyMembers.FindAsync(new Guid(memberId));
+            
+
+            if (member != null)
+            {
+                // Zaktualizuj adres URL obrazu
+                member.ImgUrl = imgUrl;
+
+                // Zapisz zmiany asynchronicznie i zwróć liczbę wpisów zmodyfikowanych w bazie danych
+                return await _context.SaveChangesAsync();
+            }
+            else
+            {
+                // Obsługa przypadku, gdy użytkownik o określonym Id nie istnieje
+                throw new BadRequestException("Saving changes to data base error", new Exception());
+            }
+
+        }
+        private async Task<int> addImageUrlToTrees(string treeId, string imgUrl)
+        {
+            var member = await _context.FamilyTrees.FindAsync(new Guid(treeId));
+            if (member != null)
+            {
+                // Zaktualizuj adres URL obrazu
+                member.ImgUrl = imgUrl;
+
+                // Zapisz zmiany asynchronicznie i zwróć liczbę wpisów zmodyfikowanych w bazie danych
+                return await _context.SaveChangesAsync();
+            }
+            else
+            {
+                // Obsługa przypadku, gdy użytkownik o określonym Id nie istnieje
+                throw new BadRequestException("Saving changes to data base error", new Exception());
+            }
+
         }
     }
 }

@@ -11,7 +11,7 @@ namespace family_tree_API.Controllers
 {
     [ApiController]
     [Route("file")]
-    [Authorize]
+    //[Authorize]
     public class ImageController : Controller
     {
         private readonly IImageService _imageService;
@@ -20,26 +20,11 @@ namespace family_tree_API.Controllers
             _imageService = imageService;
         }
 
-
-        [HttpGet("get_tree_images_url")]
-        public IActionResult trees_images()
-        {
-
-            return Json(_imageService.TreesImages()); //tutaj przekaze id kto pyta o to  
-        }
-
-        [HttpGet("get_members_images_url")]
-        public IActionResult members_images()
-        {
-            return Json(_imageService.MembersImages());
-        }
-
-       
         [HttpPost("uploadimage")]
         public async Task<IActionResult> OnPostUploadAsync(IFormFile file, string Id)
         {
             
-            return Json(_imageService.Upload(file, Id));
+            return Json(await _imageService.Upload(file, Id));
             
         }
 
