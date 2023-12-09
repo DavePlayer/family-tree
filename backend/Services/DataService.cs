@@ -7,6 +7,7 @@ namespace family_tree_API.Services
     public interface IDataService {
         List<FamilyTree> UserFamilyTrees();
         List<FamilyMember> UserFamilyMembers();
+        List<String> UserFamilyTreesNames();
     }
     public class DataService : IDataService
     {
@@ -32,6 +33,13 @@ namespace family_tree_API.Services
             return UserFamilyMembers;
         }
 
+        List<String> IDataService.UserFamilyTreesNames()
+        {
+            string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            List <FamilyTree> UserFamilyMembers = _context.FamilyTrees.Where(tree => tree.UserId.ToString() == userId).ToList();
+            List<String> TreesNames = UserFamilyMembers.Select(e=>e.Name).ToList();
+            return TreesNames;
+        }
 
 
     }

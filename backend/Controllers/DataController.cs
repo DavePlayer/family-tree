@@ -27,5 +27,10 @@ namespace family_tree_API.Controllers
         {
             return Json(_dataService.UserFamilyMembers());
         }
+
+        [HttpGet("gettreesnames")]
+        public IActionResult GetUserTreesNames() { 
+            return Json(_dataService.UserFamilyTreesNames());
+        }
     }
 }
