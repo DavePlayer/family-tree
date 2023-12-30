@@ -32,5 +32,14 @@ namespace family_tree_API.Controllers
         public IActionResult GetUserTreesNames() { 
             return Json(_dataService.UserFamilyTreesNames());
         }
+
+        [HttpDelete("deletefamilymember")]
+        public IActionResult DeleteFamilyMember(String id) {
+            if (_dataService.deletePerson(id))
+            {
+                return Ok();
+            }
+            return BadRequest();
+        }
     }
 }
