@@ -48,6 +48,7 @@ namespace family_tree_API.Services
             if (person.UserId.ToString() == userId)
             {
                 _context.FamilyMembers.Remove(person);
+                deleteNodeByUserId(person.Id.ToString());
                 return true;
             }
             return false; ;
