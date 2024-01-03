@@ -53,5 +53,12 @@ namespace family_tree_API.Services
             return false; ;
         }
 
+        void deleteConnection(String nodeId)
+        {
+            List<Connection> connections = _context.Connections.Where(c=>(c.To.ToString()==nodeId || c.From.ToString() == nodeId)).ToList();
+            _context.Connections.RemoveRange(connections);
+        }
+
+
     }
 }
