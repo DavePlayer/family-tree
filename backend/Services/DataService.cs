@@ -47,6 +47,20 @@ namespace family_tree_API.Services
             }
         }
 
+        void deleteNodeByTreeId(String treeId)
+        {
+            List <Node> nodes = _context.Nodes.Where(n => n.FamilyTree.ToString() == treeId).ToList();
+            if(nodes.Count() > 0)
+            {
+                foreach (Node node in nodes)
+                {
+                    deleteConnectionByNodeId(node.Id.ToString());
+                    deleteFamilyMemberById(node.FamilyMember.ToString());
+                    _context.Nodes.Remove(node);
+                }
+            }
+        }
+
         
 
         List<FamilyTree> IDataService.UserFamilyTrees()
