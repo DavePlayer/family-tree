@@ -9,6 +9,7 @@ namespace family_tree_API.Services
         List<FamilyMember> UserFamilyMembers();
         List<String> UserFamilyTreesNames();
         Boolean deletePerson(String personId);
+        Boolean deleteTree(String treeId);
     }
     public class DataService : IDataService
     {
@@ -47,7 +48,7 @@ namespace family_tree_API.Services
             }
         }
 
-        void deleteNodeByTreeId(String treeId)
+        void deleteNodesByTreeId(String treeId)
         {
             List <Node> nodes = _context.Nodes.Where(n => n.FamilyTree.ToString() == treeId).ToList();
             if(nodes.Count() > 0)
@@ -90,14 +91,25 @@ namespace family_tree_API.Services
             FamilyMember person = _context.FamilyMembers.Where(m => m.Id.ToString() == personId).FirstOrDefault();
             if (person.UserId.ToString() == userId)
             {
-                _context.FamilyMembers.Remove(person);
                 deleteNodeByUserId(person.Id.ToString());
+                _context.FamilyMembers.Remove(person);
                 return true;
             }
             return false; 
         }
 
-        
+        Boolean IDataService.deleteTree(String treeId)
+        {
+            string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            FamilyTree tree = _context.FamilyTrees.Where(m => m.Id.ToString() == treeId).FirstOrDefault();
+            if (tree.UserId.ToString() == userId)
+            {
+                deleteNodesByTreeId(treeId);
+                _context.FamilyTrees.Remove(tree);
+                return true;
+            }
+            return false;
+        }
 
         
     }
