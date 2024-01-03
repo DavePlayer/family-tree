@@ -20,6 +20,35 @@ namespace family_tree_API.Services
             _contextAccessor = contextAccessor;
         }
 
+        void deleteConnectionByNodeId(String nodeId)
+        {
+            List<Connection> connections = _context.Connections.Where(c => (c.To.ToString() == nodeId || c.From.ToString() == nodeId)).ToList();
+            if (connections.Count > 0)
+            {
+                _context.Connections.RemoveRange(connections);
+            }
+        }
+        void deleteNodeByUserId(String userId)
+        {
+            Node node = _context.Nodes.Where(n => n.FamilyMember.ToString() == userId).FirstOrDefault();
+            if (node != null)
+            {
+                deleteConnectionByNodeId(node.Id.ToString());
+                _context.Nodes.Remove(node);
+            }
+        }
+
+        void deleteFamilyMemberById(String familyMemberId)
+        {
+            FamilyMember member = _context.FamilyMembers.Where(m => m.Id.ToString() == familyMemberId).FirstOrDefault();
+            if(member != null)
+            {
+                _context.FamilyMembers.Remove(member);
+            }
+        }
+
+        
+
         List<FamilyTree> IDataService.UserFamilyTrees()
         {    
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -51,26 +80,11 @@ namespace family_tree_API.Services
                 deleteNodeByUserId(person.Id.ToString());
                 return true;
             }
-            return false; ;
+            return false; 
         }
 
-        void deleteConnectionByNodeId(String nodeId)
-        {
-            List<Connection> connections = _context.Connections.Where(c=>(c.To.ToString()==nodeId || c.From.ToString() == nodeId)).ToList();
-            if (connections.Count > 0)
-            {
-                _context.Connections.RemoveRange(connections);
-            }
-        }
+        
 
-        void deleteNodeByUserId(String userId)
-        {
-            Node node = _context.Nodes.Where(n => n.FamilyMember.ToString() == userId).FirstOrDefault();
-            if (node != null)
-            {
-                deleteConnectionByNodeId(node.Id.ToString());
-                _context.Nodes.Remove(node);
-            }
-        }
+        
     }
 }
