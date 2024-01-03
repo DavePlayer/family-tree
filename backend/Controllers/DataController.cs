@@ -41,5 +41,15 @@ namespace family_tree_API.Controllers
             }
             return BadRequest();
         }
+
+        [HttpDelete("deletetree")]
+        public IActionResult DeleteTree(String id)
+        {
+            if (_dataService.deleteTree(id))
+            {
+                return Ok();
+            }
+            return BadRequest();
+        }
     }
 }
