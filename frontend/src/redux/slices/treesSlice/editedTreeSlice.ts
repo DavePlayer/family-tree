@@ -20,6 +20,13 @@ export interface FamilyMember {
     additionalData?: string;
 }
 
+export interface NodeConnection {
+    id: number;
+    famTreeNumber: number;
+    from: number;
+    to: number;
+}
+
 export interface Node {
     id: number;
     posX: number;
@@ -32,6 +39,7 @@ export interface EditedTree {
     status: status;
     members: Array<FamilyMember>;
     nodes: Array<Node>;
+    connections: Array<NodeConnection>;
     toastId?: Id;
 }
 
@@ -41,6 +49,7 @@ const initialState: EditedTree = {
     status: status.pending,
     members: [],
     nodes: [],
+    connections: [],
     toastId: "getEfitedTree",
 };
 

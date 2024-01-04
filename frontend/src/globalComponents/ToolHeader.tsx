@@ -11,7 +11,7 @@ export const ToolHeader = () => {
     const editedTree = useSelector((root: RootState) => root.editedTree);
     return (
         <>
-            <header className="header fixed">
+            <header className="header fixed z-30">
                 <div className="flex items-center justify-center">
                     <LogoSvg className="w-[50px] h-auto ml-[-0.3em]" />
                     <div className="p-1.5 bg-default-color rounded-full cursor-pointer ml-4">
