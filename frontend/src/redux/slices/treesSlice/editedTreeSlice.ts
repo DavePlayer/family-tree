@@ -11,30 +11,29 @@ enum status {
 }
 
 export interface FamilyMember {
-    img_url: string,
-    id: number
-    name: string,
-    status: string,
-    deathTime: Date | null,
-    address: string,
-    additionalData?: string
+    img_url: string;
+    id: number;
+    name: string;
+    status: string;
+    deathTime: Date | null;
+    address: string;
+    additionalData?: string;
 }
 
 export interface Node {
-    id: number,
-    posX: number,
-    posY: number,
-    famMemId: number | null
+    id: number;
+    posX: number;
+    posY: number;
+    famMemId: number | null;
 }
 
 export interface EditedTree {
-    tree: Tree | null,
-    status: status,
-    members: Array<FamilyMember>,
-    nodes: Array<Node>
+    tree: Tree | null;
+    status: status;
+    members: Array<FamilyMember>;
+    nodes: Array<Node>;
     toastId?: Id;
 }
-
 
 // Define the initial state using that type
 const initialState: EditedTree = {
@@ -42,7 +41,7 @@ const initialState: EditedTree = {
     status: status.pending,
     members: [],
     nodes: [],
-    toastId: "getEfitedTree"
+    toastId: "getEfitedTree",
 };
 
 export const treesSlice = createSlice({
@@ -68,8 +67,6 @@ export const treesSlice = createSlice({
             state.status = status.loading;
         });
         builder.addCase(fetchEditerTreeData.fulfilled, (state, action) => {
-            // redo cause errors
-            state.status = status.loaded;
             const newState = {
                 ...state,
                 status: status.loaded,
@@ -100,4 +97,3 @@ export const treesSlice = createSlice({
 // export const { incrementByAmount } = counterSlice.actions;
 
 export default treesSlice.reducer;
-

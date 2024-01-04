@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 
 export const ToolHeader = () => {
     const navigate = useNavigate();
-    const editedTree = useSelector((root: RootState) => root.editedTree)
+    const editedTree = useSelector((root: RootState) => root.editedTree);
     return (
         <>
             <header className="header fixed">
@@ -25,10 +25,11 @@ export const ToolHeader = () => {
                     </div>
                 </div>
                 <h1 className="absolute z-[-1] l-0 w-full text-center">{editedTree.tree?.name}</h1>
-                <button onClick={() => navigate("/trees")} className="button orange">Exit Tree</button>
+                <button onClick={() => navigate("/trees")} className="button orange">
+                    Exit Tree
+                </button>
             </header>
             <Outlet />
         </>
     );
 };
-

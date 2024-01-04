@@ -47,12 +47,15 @@ export const TreesViewRoute = () => {
                     trees.map((tree) => {
                         return (
                             <Link to={`/trees/${tree.id}`} className="w-1/5">
-                                <article key={tree.id} className="w-full rounded-3xl overflow-hidden cursor-pointer">
+                                <article
+                                    key={tree.id}
+                                    className="w-full rounded-3xl overflow-hidden cursor-pointer"
+                                >
                                     <figure className="h-[10rem] overflow-hidden rounded-3xl flex justify-center">
                                         <img
                                             src={tree.imgUrl}
                                             alt="background"
-                                            className="h-full max-w-none block no-tap"
+                                            className="w-full max-w-none block no-tap"
                                         />
                                     </figure>
                                     <p className="w-full text-center no-tap">{tree.name}</p>

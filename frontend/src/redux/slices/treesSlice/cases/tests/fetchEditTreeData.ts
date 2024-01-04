@@ -1,9 +1,5 @@
-
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { EditedTree } from "../../editedTreeSlice";
-import { Tree } from "../../treeSlice";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../../store";
 
 export const fetchEditerTreeData = createAsyncThunk(
     "trees/fetchEditedTree",
@@ -16,27 +12,27 @@ export const fetchEditerTreeData = createAsyncThunk(
                         tree: {
                             id: treeId,
                             name: "test tree",
-                            imgUrl: ""
+                            imgUrl: "",
                         },
                         nodes: [
                             {
                                 id: 1,
                                 famMemId: 1,
                                 posX: 1,
-                                posY: 1
+                                posY: 1,
                             },
                             {
                                 id: 2,
                                 famMemId: 2,
                                 posX: 3,
-                                posY: 1
+                                posY: 1,
                             },
                             {
                                 id: 1,
                                 famMemId: null,
                                 posX: 2,
-                                posY: 2
-                            }
+                                posY: 2,
+                            },
                         ],
                         members: [
                             {
@@ -45,7 +41,7 @@ export const fetchEditerTreeData = createAsyncThunk(
                                 deathTime: null,
                                 img_url: "asd",
                                 name: "family member 1",
-                                status: "alive"
+                                status: "alive",
                             },
                             {
                                 id: 2,
@@ -53,9 +49,9 @@ export const fetchEditerTreeData = createAsyncThunk(
                                 deathTime: null,
                                 img_url: "asd",
                                 name: "family member 2",
-                                status: "alive"
-                            }
-                        ]
+                                status: "alive",
+                            },
+                        ],
                     });
                 }
                 rej(new Error("test promise error"));
