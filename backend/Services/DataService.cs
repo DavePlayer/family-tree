@@ -9,7 +9,8 @@ namespace family_tree_API.Services
         List<FamilyMember> UserFamilyMembers();
         List<String> UserFamilyTreesNames();
         Boolean deletePerson(String personId);
-        Boolean deleteTree(String treeId);
+        Boolean deleteTreeById(String treeId);
+        Boolean deleteUser();
     }
     public class DataService : IDataService
     {
@@ -46,6 +47,11 @@ namespace family_tree_API.Services
             {
                 _context.FamilyMembers.Remove(member);
             }
+        }
+        void deleteTree(FamilyTree tree)
+        {
+            deleteNodesByTreeId(tree.UserId.ToString());
+            _context.FamilyTrees.Remove(tree);
         }
 
         void deleteNodesByTreeId(String treeId)
@@ -88,6 +94,7 @@ namespace family_tree_API.Services
         Boolean IDataService.deletePerson(String personId)
         {
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             FamilyMember person = _context.FamilyMembers.Where(m => m.Id.ToString() == personId).FirstOrDefault();
             if (person.UserId.ToString() == userId)
             {
@@ -98,7 +105,7 @@ namespace family_tree_API.Services
             return false; 
         }
 
-        Boolean IDataService.deleteTree(String treeId)
+        Boolean IDataService.deleteTreeById(String treeId)
         {
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             FamilyTree tree = _context.FamilyTrees.Where(m => m.Id.ToString() == treeId).FirstOrDefault();
@@ -111,6 +118,29 @@ namespace family_tree_API.Services
             return false;
         }
 
-        
+        Boolean IDataService.deleteUser()
+        {
+            string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if(userId != null)
+            {
+                User user = _context.Users.Where(u=> u.Id.ToString() == userId).FirstOrDefault();
+                if (user != null)
+                {
+                    List <FamilyTree> trees = _context.FamilyTrees.Where(t=> t.UserId.ToString() == userId).ToList();
+                    if (trees.Count > 0)
+                    {
+                        foreach (FamilyTree tree in trees)
+                        {
+                            deleteTree(tree);
+                        }
+                        _context.Users.Remove(user);
+                        return true;
+                    }
+                }
+                return false;
+            }
+            
+            return false;
+        }
     }
 }

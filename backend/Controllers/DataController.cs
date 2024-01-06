@@ -45,7 +45,7 @@ namespace family_tree_API.Controllers
         [HttpDelete("deletetree")]
         public IActionResult DeleteTree(String id)
         {
-            if (_dataService.deleteTree(id))
+            if (_dataService.deleteTreeById(id))
             {
                 return Ok();
             }
