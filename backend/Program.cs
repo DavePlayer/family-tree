@@ -48,6 +48,7 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IDeleteDataService, DeleteDataService>();
+builder.Services.AddScoped<IAddDataService, AddDataService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddDbContext<FamilyTreeContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("familyTreeContext")));
 builder.Services.AddScoped<ErrorHandlingMiddleware>();
