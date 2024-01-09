@@ -4,7 +4,8 @@ using System.Security.Claims;
 
 namespace family_tree_API.Services
 {
-    public interface IDataService {
+    public interface IDeleteDataService
+    {
         List<FamilyTree> UserFamilyTrees();
         List<FamilyMember> UserFamilyMembers();
         List<String> UserFamilyTreesNames();
@@ -12,17 +13,17 @@ namespace family_tree_API.Services
         Boolean deleteTreeById(String treeId);
         Boolean deleteUser();
     }
-    public class DataService : IDataService
+    public class DeleteDataService : IDeleteDataService
     {
         private readonly FamilyTreeContext _context;
         private readonly IHttpContextAccessor _contextAccessor;
-        public DataService(FamilyTreeContext context, IHttpContextAccessor contextAccessor)
+        public DeleteDataService(FamilyTreeContext context, IHttpContextAccessor contextAccessor)
         {
             _context = context;
             _contextAccessor = contextAccessor;
         }
 
-        void deleteConnectionByNodeId(String nodeId)
+        private void deleteConnectionByNodeId(String nodeId)
         {
             List<Connection> connections = _context.Connections.Where(c => (c.To.ToString() == nodeId || c.From.ToString() == nodeId)).ToList();
             if (connections.Count > 0)
@@ -30,7 +31,7 @@ namespace family_tree_API.Services
                 _context.Connections.RemoveRange(connections);
             }
         }
-        void deleteNodeByUserId(String userId)
+        private void deleteNodeByUserId(String userId)
         {
             Node node = _context.Nodes.Where(n => n.FamilyMember.ToString() == userId).FirstOrDefault();
             if (node != null)
@@ -40,7 +41,7 @@ namespace family_tree_API.Services
             }
         }
 
-        void deleteFamilyMemberById(String familyMemberId)
+        private void deleteFamilyMemberById(String familyMemberId)
         {
             FamilyMember member = _context.FamilyMembers.Where(m => m.Id.ToString() == familyMemberId).FirstOrDefault();
             if(member != null)
@@ -48,13 +49,13 @@ namespace family_tree_API.Services
                 _context.FamilyMembers.Remove(member);
             }
         }
-        void deleteTree(FamilyTree tree)
+        private void deleteTree(FamilyTree tree)
         {
             deleteNodesByTreeId(tree.UserId.ToString());
             _context.FamilyTrees.Remove(tree);
         }
 
-        void deleteNodesByTreeId(String treeId)
+        private void deleteNodesByTreeId(String treeId)
         {
             List <Node> nodes = _context.Nodes.Where(n => n.FamilyTree.ToString() == treeId).ToList();
             if(nodes.Count() > 0)
@@ -70,28 +71,28 @@ namespace family_tree_API.Services
 
         
 
-        List<FamilyTree> IDataService.UserFamilyTrees()
+        List<FamilyTree> IDeleteDataService.UserFamilyTrees()
         {    
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             List<FamilyTree> UserFamilyTrees = _context.FamilyTrees.Where(tree => tree.UserId.ToString() == userId).ToList();
             return UserFamilyTrees;
         }
 
-        List<FamilyMember> IDataService.UserFamilyMembers()
+        List<FamilyMember> IDeleteDataService.UserFamilyMembers()
         {
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             List<FamilyMember> UserFamilyMembers = _context.FamilyMembers.Where(tree => tree.UserId.ToString() == userId).ToList();
             return UserFamilyMembers;
         }
 
-        List<String> IDataService.UserFamilyTreesNames()
+        List<String> IDeleteDataService.UserFamilyTreesNames()
         {
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             List <FamilyTree> UserFamilyMembers = _context.FamilyTrees.Where(tree => tree.UserId.ToString() == userId).ToList();
             List<String> TreesNames = UserFamilyMembers.Select(e=>e.Name).ToList();
             return TreesNames;
         }
-        Boolean IDataService.deletePerson(String personId)
+        Boolean IDeleteDataService.deletePerson(String personId)
         {
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -105,7 +106,7 @@ namespace family_tree_API.Services
             return false; 
         }
 
-        Boolean IDataService.deleteTreeById(String treeId)
+        Boolean IDeleteDataService.deleteTreeById(String treeId)
         {
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             FamilyTree tree = _context.FamilyTrees.Where(m => m.Id.ToString() == treeId).FirstOrDefault();
@@ -118,7 +119,7 @@ namespace family_tree_API.Services
             return false;
         }
 
-        Boolean IDataService.deleteUser()
+        Boolean IDeleteDataService.deleteUser()
         {
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             if(userId != null)

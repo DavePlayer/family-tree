@@ -45,6 +45,7 @@ namespace family_tree_API.Services
 
         string IAccountService.GenerateJwt(LoginDto dto)
         {
+            
             var user = _context.Users.FirstOrDefault(u => u.EMail == dto.Email);
             if (user == null)
             {

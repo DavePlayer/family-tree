@@ -10,32 +10,36 @@ namespace family_tree_API.Controllers
     [Authorize]
     public class DataController : Controller
     {
-        private readonly IDataService _dataService;
-        public DataController(IDataService dataService)
+        private readonly IDeleteDataService _deleteDataService;
+        public DataController(IDeleteDataService deleteDataService)
         {
-            _dataService = dataService;
+            _deleteDataService = deleteDataService;
         }
 
+        [Route("trees")]
         [HttpGet("gettrees")]
         public IActionResult GetUserTrees()
         {
-            return Json(_dataService.UserFamilyTrees());
+            return Json(_deleteDataService.UserFamilyTrees());
         }
+
+
+
 
         [HttpGet("getmembers")]
         public IActionResult GetUserMembers()
         {
-            return Json(_dataService.UserFamilyMembers());
+            return Json(_deleteDataService.UserFamilyMembers());
         }
 
         [HttpGet("gettreesnames")]
-        public IActionResult GetUserTreesNames() { 
-            return Json(_dataService.UserFamilyTreesNames());
+        public IActionResult GetUserTreesNames() {
+            return Json(_deleteDataService.UserFamilyTreesNames());
         }
 
         [HttpDelete("deletefamilymember")]
         public IActionResult DeleteFamilyMember(String id) {
-            if (_dataService.deletePerson(id))
+            if (_deleteDataService.deletePerson(id))
             {
                 return Ok();
             }
@@ -45,11 +49,15 @@ namespace family_tree_API.Controllers
         [HttpDelete("deletetree")]
         public IActionResult DeleteTree(String id)
         {
-            if (_dataService.deleteTreeById(id))
+            if (_deleteDataService.deleteTreeById(id))
             {
                 return Ok();
             }
             return BadRequest();
         }
+
+
+
+        [HttpPost()]
     }
 }
