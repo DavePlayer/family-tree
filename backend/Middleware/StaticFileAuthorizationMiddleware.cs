@@ -2,15 +2,16 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using System.Security.Claims;
 
 internal class StaticFileAuthorizationMiddleware : IMiddleware
 {
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        if (!context.User.Identity.IsAuthenticated && context.Request.Path.Value.Contains("assets"))
+        if (!context.User.Identity.IsAuthenticated && (context.Request.Path.Value.Contains("assets")|| context.Request.Path.Value.Contains("uploadimage")))
         {
-            context.Response.StatusCode = 404;
+            context.Response.StatusCode = 401; //unathorized
             return;
         }
         if (context.User.Identity.IsAuthenticated && context.Request.Path.Value.Contains("assets")){
