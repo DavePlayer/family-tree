@@ -20,7 +20,7 @@ namespace family_tree_API.Controllers
             _addDataService = addDataService;
         }
 
-        [Route("trees")]
+       // [Route("trees")]
         [HttpGet("gettrees")]
         public IActionResult GetUserTrees()
         {
@@ -43,7 +43,7 @@ namespace family_tree_API.Controllers
 
 
 
-        [Route("members")]
+        //[Route("members")]
         [HttpGet("getmembers")]
         public IActionResult GetUserMembers()
         {
@@ -67,11 +67,11 @@ namespace family_tree_API.Controllers
 
 
 
-        [Route("node")]
+        //[Route("node")]
 
 
 
-        [Route("connection")]
+       // [Route("connection")]
         [HttpPost]
         public IActionResult AddConnection()
         {
