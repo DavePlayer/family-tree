@@ -51,5 +51,15 @@ namespace family_tree_API.Controllers
             }
             return BadRequest();
         }
+
+        [HttpDelete("deleteuser")]
+        public IActionResult DeleteUser()
+        {
+            if (_dataService.deleteUser())
+            {
+                return Ok();
+            }
+            return BadRequest();
+        }
     }
 }
