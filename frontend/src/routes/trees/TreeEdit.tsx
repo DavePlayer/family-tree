@@ -5,6 +5,7 @@ import { fetchEditerTreeData } from "../../redux/slices/treesSlice/cases/tests/f
 import { useEffect, useRef } from "react";
 import * as d3 from "d3";
 import { useContainerDimensions } from "../../globalHooks/useContainerDimensions.ts";
+import { FamilyMember } from "../../redux/slices/treesSlice/editedTreeSlice.ts";
 
 export const TreeEdit = () => {
     const params = useParams();
@@ -67,11 +68,9 @@ export const TreeEdit = () => {
             const target = nodesData.find((node) => node.id === d.to);
 
             if (source && target) {
-                return `M${source.posX + (source.famMemId ? imageSize / 2 : nodeSize / 2)},${
-                    source.posY + (source.famMemId ? imageSize / 2 : nodeSize / 2)
-                } L${target.posX + (target.famMemId ? imageSize / 2 : nodeSize / 2)},${
-                    target.posY + (target.famMemId ? imageSize / 2 : nodeSize / 2)
-                }`;
+                return `M${source.posX + (source.famMemId ? imageSize / 2 : nodeSize / 2)},${source.posY + (source.famMemId ? imageSize / 2 : nodeSize / 2)
+                    } L${target.posX + (target.famMemId ? imageSize / 2 : nodeSize / 2)},${target.posY + (target.famMemId ? imageSize / 2 : nodeSize / 2)
+                    }`;
             } else {
                 // Handle cases where source or target is not found
                 return "";
@@ -108,9 +107,12 @@ export const TreeEdit = () => {
             (d: any) => d.id
         );
 
+
         const nodeEnter = node
             .enter()
             .append("g")
+            .on("mouseenter", nodeMouseover)
+            .on("mouseleave", nodeMouseLeave)
             .attr("class", "nodes")
             .style("cursor", "pointer");
 
@@ -149,6 +151,41 @@ export const TreeEdit = () => {
             .on("error", function () {
                 d3.select(this).attr("xlink:href", "path-to-your-fallback-image.jpg");
             });
+
+        nodeEnter.append("text")
+            .attr("class", "label")
+            .text(function (d) {
+                const member = editedTree.members.find(mem => mem.id === d.famMemId)
+                var titleToDisplay = d.famMemId ? member?.name || "" : ""
+
+                return titleToDisplay;
+            })
+            .attr("font-size", "15px")
+            .attr("fill-opacity", "0")
+            .attr("transform", function (d) {
+                // to do centering by text length
+                return "translate(" + (d.x + (imageSize / 4)) + "," + (d.y + (imageSize)) + ")";
+            })
+            .style("fill", "#FD7900")
+
+
+        function nodeMouseover(this: any, e: any, d: { id: number; posX: number; posY: number; famMemId: number | null; x: number; y: number; }) {
+            if (d.famMemId) {
+                const theNode = d3.select(this);
+
+                theNode.transition().duration(250).select(".label")
+                    .attr("fill-opacity", "1")
+            }
+        }
+        function nodeMouseLeave(this: any, e: any, d: { id: number; posX: number; posY: number; famMemId: number | null; x: number; y: number; }) {
+            if (d.famMemId) {
+                const theNode = d3.select(this);
+
+                theNode.transition().duration(250).select(".label")
+                    .attr("fill-opacity", "0")
+
+            }
+        }
 
         //defining zooming functionality
         function zoomed({ transform }: any) {

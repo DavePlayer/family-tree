@@ -39,6 +39,12 @@ export const fetchEditerTreeData = createAsyncThunk(
                                 posX: 500,
                                 posY: 200,
                             },
+                            {
+                                id: 5,
+                                famMemId: null,
+                                posX: 515,
+                                posY: 300,
+                            },
                         ],
                         connections: [
                             {
@@ -58,6 +64,12 @@ export const fetchEditerTreeData = createAsyncThunk(
                                 famTreeNumber: 1,
                                 from: 4,
                                 to: 3,
+                            },
+                            {
+                                id: 4,
+                                famTreeNumber: 1,
+                                from: 4,
+                                to: 5,
                             },
                         ],
                         members: [
@@ -85,7 +97,7 @@ export const fetchEditerTreeData = createAsyncThunk(
                                 deathTime: null,
                                 img_url:
                                     "https://i.pinimg.com/474x/ea/6f/8e/ea6f8eb29166d0b2f14faa42f6d32605.jpg",
-                                name: "family member 3",
+                                name: "xd",
                                 status: "alive",
                             },
                         ],
