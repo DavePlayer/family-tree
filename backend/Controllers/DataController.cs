@@ -57,6 +57,17 @@ namespace family_tree_API.Controllers
             }
             return BadRequest();
         }
+
+        [HttpDelete("deleteuser")]
+        public IActionResult DeleteUser()
+        {
+            if (_deleteDataService.deleteUser())
+            {
+                return Ok();
+            }
+            return BadRequest();
+        }
+
         [HttpPost("addfamilymember")]
         public IActionResult AddFamilyMember(FamilyMemberDto dto)
         {
