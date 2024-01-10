@@ -1,4 +1,5 @@
-﻿using family_tree_API.Services;
+﻿using family_tree_API.Dto;
+using family_tree_API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,6 +34,14 @@ namespace family_tree_API.Controllers
                 return Ok();
             }
             return BadRequest();
+        }
+
+        [HttpDelete("addtree")]
+        public IActionResult AddTree([FromBody] FamilyTreeDto dto)
+        {
+            
+            return Ok(_treeService.AddFamilyTree(dto));
+            
         }
     }
 }
