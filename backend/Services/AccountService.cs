@@ -14,6 +14,8 @@ namespace family_tree_API.Services
         void RegisterUser(RegisterUserDto dto);
 
         string GenerateJwt(LoginDto dto);
+
+        Boolean DeleteUser();
     }
 
     public class AccountService : IAccountService
@@ -21,12 +23,14 @@ namespace family_tree_API.Services
         private readonly FamilyTreeContext _context;
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _contextAccessor;
 
-        public AccountService(FamilyTreeContext context, IPasswordHasher<User> passwordHasher, IConfiguration configuration)
+        public AccountService(FamilyTreeContext context, IPasswordHasher<User> passwordHasher, IConfiguration configuration, IHttpContextAccessor contextAccessor)
         {
             _context = context;
             _passwordHasher = passwordHasher;
             _configuration = configuration;
+            _contextAccessor = contextAccessor;
         }
 
         public void RegisterUser(RegisterUserDto dto)
@@ -78,5 +82,76 @@ namespace family_tree_API.Services
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
             return jwt;
         }
+
+
+
+
+
+
+
+
+        private void deleteFamilyMemberById(String familyMemberId)
+        {
+            FamilyMember member = _context.FamilyMembers.Where(m => m.Id.ToString() == familyMemberId).FirstOrDefault();
+            if (member != null)
+            {
+                _context.FamilyMembers.Remove(member);
+            }
+        }
+        private void deleteConnectionByNodeId(String nodeId)
+        {
+            List<Connection> connections = _context.Connections.Where(c => (c.To.ToString() == nodeId || c.From.ToString() == nodeId)).ToList();
+            if (connections.Count > 0)
+            {
+                _context.Connections.RemoveRange(connections);
+            }
+        }
+        
+
+        private void deleteNodesByTreeId(String treeId)
+        {
+            List<Node> nodes = _context.Nodes.Where(n => n.FamilyTree.ToString() == treeId).ToList();
+            if (nodes.Count() > 0)
+            {
+                foreach (Node node in nodes)
+                {
+                    deleteConnectionByNodeId(node.Id.ToString());
+                    deleteFamilyMemberById(node.FamilyMember.ToString());
+                    _context.Nodes.Remove(node);
+                }
+            }
+        }
+
+        private void deleteTree(FamilyTree tree)
+        {
+            deleteNodesByTreeId(tree.UserId.ToString());
+            _context.FamilyTrees.Remove(tree);
+        }
+
+        Boolean IAccountService.DeleteUser()
+        {
+            string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId != null)
+            {
+                User user = _context.Users.Where(u => u.Id.ToString() == userId).FirstOrDefault();
+                if (user != null)
+                {
+                    List<FamilyTree> trees = _context.FamilyTrees.Where(t => t.UserId.ToString() == userId).ToList();
+                    if (trees.Count > 0)
+                    {
+                        foreach (FamilyTree tree in trees)
+                        {
+                            deleteTree(tree);
+                        }
+                        _context.Users.Remove(user);
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            return false;
+        }
+
     }
 }

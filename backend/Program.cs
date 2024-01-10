@@ -46,9 +46,14 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddScoped<IConnectionService, ConnectionService>();
 builder.Services.AddScoped<IImageService, ImageService>();
-builder.Services.AddScoped<IDeleteDataService, DeleteDataService>();
-builder.Services.AddScoped<IAddDataService, AddDataService>();
+builder.Services.AddScoped<IMemberService, MemberService>();
+builder.Services.AddScoped<INodeService, NodeService>();
+builder.Services.AddScoped<ITreeService, TreeService>();
+
+
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddDbContext<FamilyTreeContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("familyTreeContext")));
 builder.Services.AddScoped<ErrorHandlingMiddleware>();

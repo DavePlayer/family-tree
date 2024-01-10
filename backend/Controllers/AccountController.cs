@@ -27,5 +27,15 @@ namespace family_tree_API.Controllers
             string token = _accountService.GenerateJwt(dto);
             return Ok(token);
         }
+
+        [HttpDelete("deleteuser")]
+        public IActionResult DeleteUser()
+        {
+            if (_accountService.DeleteUser())
+            {
+                return Ok();
+            }
+            return BadRequest();
+        }
     }
 }
