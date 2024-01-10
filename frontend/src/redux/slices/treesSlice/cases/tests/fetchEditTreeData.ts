@@ -45,6 +45,18 @@ export const fetchEditerTreeData = createAsyncThunk(
                                 posX: 515,
                                 posY: 300,
                             },
+                            {
+                                id: 6,
+                                famMemId: null,
+                                posX: 490,
+                                posY: 250,
+                            },
+                            {
+                                id: 7,
+                                famMemId: null,
+                                posX: 515,
+                                posY: 280,
+                            },
                         ],
                         connections: [
                             {
@@ -79,7 +91,7 @@ export const fetchEditerTreeData = createAsyncThunk(
                                 deathTime: null,
                                 img_url:
                                     "https://styles.redditmedia.com/t5_694yxb/styles/communityIcon_dhqkfwpxb4v81.png",
-                                name: "family member 1",
+                                name: "Loid Forger",
                                 status: "alive",
                             },
                             {
@@ -88,7 +100,7 @@ export const fetchEditerTreeData = createAsyncThunk(
                                 deathTime: null,
                                 img_url:
                                     "https://styles.redditmedia.com/t5_yo4xr/styles/communityIcon_eb8yllaafbqb1.png",
-                                name: "family member 2",
+                                name: "Anya Forger",
                                 status: "alive",
                             },
                             {
@@ -97,7 +109,7 @@ export const fetchEditerTreeData = createAsyncThunk(
                                 deathTime: null,
                                 img_url:
                                     "https://i.pinimg.com/474x/ea/6f/8e/ea6f8eb29166d0b2f14faa42f6d32605.jpg",
-                                name: "xd",
+                                name: "Yor Forger",
                                 status: "alive",
                             },
                         ],
