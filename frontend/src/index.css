@@ -78,6 +78,26 @@ input {
     @apply p-2 bg-transparent text-default-color rounded-3xl pl-4 border-[1px];
 }
 
+select {
+    @apply py-1 px-3 bg-dark-1 min-w-[15rem] text-center rounded-full border border-default-color appearance-none relative;
+}
+
+.select-wrapper {
+    @apply relative;
+}
+
+.select-wrapper:after {
+    content: "▼";
+    font-size: 1rem;
+    top: 6px;
+    right: 10px;
+    position: absolute;
+}
+
+.select-wrapper:after select:focus {
+    transform: rotate(90);
+}
+
 .header {
     @apply bg-dark-1 fixed top-0 left-0 text-default-color p-3 w-full flex justify-between items-center;
 }

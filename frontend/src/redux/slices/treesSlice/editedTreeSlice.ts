@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { Id, toast } from "react-toastify";
 import { Tree } from "./treeSlice.ts";
 import { fetchEditerTreeData } from "./cases/tests/fetchEditTreeData.ts";
+import { updateFamilyMemberData } from "./cases/tests/updateFamilyMemberData.ts";
 
 enum status {
     pending,
@@ -94,6 +95,43 @@ export const treesSlice = createSlice({
             if (state && state.toastId)
                 toast.update(state.toastId, {
                     render: "failed to get given tree",
+                    type: "error",
+                    isLoading: false,
+                    autoClose: 2000,
+                });
+            console.error(`${payload.error.code}: ${payload.error.message}`);
+        });
+
+        // ---------------------
+        // Update Family Member
+        // ---------------------
+        builder.addCase(updateFamilyMemberData.pending, (state) => {
+            console.log("pending updating family member from thunk");
+            state.toastId = toast.loading("Updating Family member", {
+                autoClose: 5000,
+                closeButton: true,
+                closeOnClick: true,
+                toastId: "UpdateFamMember",
+            });
+            state.status = status.loading;
+        });
+        builder.addCase(updateFamilyMemberData.fulfilled, (state, action) => {
+            const newMembers = state.members.map((mem) =>
+                mem.id !== action.payload.id ? mem : action.payload
+            );
+            if (state.toastId)
+                toast.update(state.toastId, {
+                    render: "updates member successfully",
+                    type: "success",
+                    isLoading: false,
+                    autoClose: 2000,
+                });
+            return { ...state, members: newMembers };
+        });
+        builder.addCase(updateFamilyMemberData.rejected, (state, payload) => {
+            if (state && state.toastId)
+                toast.update(state.toastId, {
+                    render: "failed to update member",
                     type: "error",
                     isLoading: false,
                     autoClose: 2000,

@@ -2,15 +2,19 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { AppDispatch, RootState } from "../../redux/store";
 import { fetchEditerTreeData } from "../../redux/slices/treesSlice/cases/tests/fetchEditTreeData";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { useContainerDimensions } from "../../globalHooks/useContainerDimensions.ts";
-import { FamilyMember } from "../../redux/slices/treesSlice/editedTreeSlice.ts";
+import { EditedTree, FamilyMember } from "../../redux/slices/treesSlice/editedTreeSlice.ts";
+import Popup from "reactjs-popup";
+import { FamilyMemberInfo } from "../../globalComponents/modals/FamilyMemberInfo.tsx";
 
 export const TreeEdit = () => {
     const params = useParams();
     const dispatch = useDispatch<AppDispatch>();
     const editedTree = useSelector((root: RootState) => root.editedTree);
+    const [selectedFamMamber, setSelectedFamMember] = useState<number | null>(null);
+    const latestEditedTree = useRef<EditedTree>(editedTree);
     const mapRef = useRef(null);
     const { width: famTreeWidth, height: famTreeHeight } = useContainerDimensions(mapRef);
 
@@ -18,12 +22,13 @@ export const TreeEdit = () => {
         dispatch(fetchEditerTreeData(parseInt(params.id || "-1")));
     }, []);
     useEffect(() => {
+        latestEditedTree.current = editedTree;
         const imageSize = 50;
         const nodeSize = 15;
         const labelSize = 15;
 
         const focus = d3.select(".plot-area");
-        const nodesData = editedTree.nodes
+        let nodesData = latestEditedTree.current.nodes
             .map((d) => ({
                 x: d.posX,
                 y: d.posY,
@@ -31,7 +36,7 @@ export const TreeEdit = () => {
             }))
             // so family members will be rendered first and be on top of nodes
             .sort((a, _) => (a.famMemId !== null ? 1 : 0));
-        const linksData = editedTree.connections.map((d) => ({
+        const linksData = latestEditedTree.current.connections.map((d) => ({
             index: d.id,
             target: d.to,
             source: d.from,
@@ -40,7 +45,7 @@ export const TreeEdit = () => {
         if (!nodesData || !linksData) return;
 
         // creating entire chart
-        const simulation = d3
+        let simulation = d3
             .forceSimulation(nodesData)
             .force("charge", d3.forceManyBody().strength(-150))
             .force("x", d3.forceX())
@@ -64,7 +69,7 @@ export const TreeEdit = () => {
             .style("fill", "#fff");
 
         // Merge the enter and existing selections
-        const link = linkEnter.merge(links as any);
+        let link = linkEnter.merge(links as any);
 
         link.attr("d", (d) => {
             const source = nodesData.find((node) => node.id === d.from);
@@ -117,6 +122,7 @@ export const TreeEdit = () => {
             .append("g")
             .on("mouseenter", nodeMouseover)
             .on("mouseleave", nodeMouseLeave)
+            .on("click", nodeMouseClick)
             .attr("class", "nodes")
             .style("cursor", "pointer");
 
@@ -139,7 +145,7 @@ export const TreeEdit = () => {
             .append("image")
             .attr("xlink:href", (d) => {
                 if (d.famMemId) {
-                    const [familyMember] = editedTree.members.filter(
+                    const [familyMember] = latestEditedTree.current.members.filter(
                         (member) => member.id === d.famMemId
                     );
                     return familyMember ? familyMember.img_url : "#";
@@ -161,7 +167,9 @@ export const TreeEdit = () => {
             .attr("class", "label")
             .attr("id", (d) => `label${d.id}`)
             .text(function (d) {
-                const member = editedTree.members.find((mem) => mem.id === d.famMemId);
+                const member = latestEditedTree.current.members.find(
+                    (mem) => mem.id === d.famMemId
+                );
                 const titleToDisplay = d.famMemId ? member?.name || "" : "";
 
                 return titleToDisplay;
@@ -171,7 +179,9 @@ export const TreeEdit = () => {
             .attr("text-anchor", "middle")
             .attr("dominant-baseline", "middle")
             .attr("transform", function (d) {
-                const member = editedTree.members.find((mem) => mem.id === d.famMemId);
+                const member = latestEditedTree.current.members.find(
+                    (mem) => mem.id === d.famMemId
+                );
                 const titleToDisplay = d.famMemId ? member?.name || "" : "";
 
                 // ayo that's sick. ugly and slow in performance but works
@@ -208,7 +218,9 @@ export const TreeEdit = () => {
             if (d.famMemId) {
                 const theNode = d3.select(this);
 
-                const member = editedTree.members.find((mem) => mem.id === d.famMemId);
+                const member = latestEditedTree.current.members.find(
+                    (mem) => mem.id === d.famMemId
+                );
                 const titleToDisplay = d.famMemId ? member?.name || "" : "";
 
                 // Append temporary text element to the SVG container
@@ -224,9 +236,9 @@ export const TreeEdit = () => {
                 const textWidth = tempText.getBBox().width;
                 const textHeight = tempText.getBBox().height;
 
-                const offset = Math.round(imageSize / 2) - textWidth / 2;
+                console.log(titleToDisplay);
 
-                console.log(tempText, tempText.getComputedTextLength(), textWidth);
+                const offset = Math.round(imageSize / 2) - textWidth / 2;
 
                 // Remove the temporary text element
                 d3.select(tempText).remove();
@@ -268,6 +280,21 @@ export const TreeEdit = () => {
             }
         }
 
+        function nodeMouseClick(
+            this: any,
+            _: any,
+            d: {
+                id: number;
+                posX: number;
+                posY: number;
+                famMemId: number | null;
+                x: number;
+                y: number;
+            }
+        ) {
+            setSelectedFamMember(d.famMemId);
+        }
+
         //defining zooming functionality
         function zoomed({ transform }: any) {
             focus.attr("transform", transform);
@@ -292,9 +319,18 @@ export const TreeEdit = () => {
 
         const updateNodes = () => {
             // Update SVG elements based on simulation state
-            svg.selectAll(".node")
-                .attr("cx", (d: any) => d.x)
-                .attr("cy", (d: any) => d.y);
+            const members = latestEditedTree.current.members;
+
+            svg.selectAll(".nodes")
+                .attr("x", (d: any) => d.x)
+                .attr("y", (d: any) => d.y)
+                .select("text")
+                .text((d: any) => {
+                    const member = members.find((mem) => mem.id == d.famMemId);
+                    if (member) return member.name;
+                    if (d.famMemId) return "name not found";
+                    return null;
+                });
         };
 
         // defining button to reset position
@@ -329,6 +365,42 @@ export const TreeEdit = () => {
                     </button>
                 </div>
             </main>
+            <Popup
+                open={selectedFamMamber !== null}
+                // trigger={
+                //     <button
+                //         onClick={() => setPopupOpen(true)}
+                //         className="button orange absolute right-10 bottom-1/2 translate-y-1/2"
+                //     >
+                //         CREATE NEW TREE
+                //     </button>
+                // }
+                onClose={() => {
+                    setSelectedFamMember(null);
+                }}
+                modal
+                nested
+            >
+                {
+                    // It looks like there is a line to allow it but it is commented out
+                    // I'm assuming it was difficult to type properly and the library author gave up.
+                    // @ts-ignore
+                    (close) => (
+                        <>
+                            {selectedFamMamber && (
+                                <FamilyMemberInfo
+                                    famMember={
+                                        editedTree.members.find(
+                                            (m) => m.id === selectedFamMamber
+                                        ) as FamilyMember
+                                    }
+                                    close={close}
+                                />
+                            )}
+                        </>
+                    )
+                }
+            </Popup>
         </>
     );
 };

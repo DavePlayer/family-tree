@@ -102,6 +102,7 @@ export const fetchEditerTreeData = createAsyncThunk(
                                     "https://styles.redditmedia.com/t5_yo4xr/styles/communityIcon_eb8yllaafbqb1.png",
                                 name: "Anya Forger",
                                 status: "alive",
+                                additionalData: "zajeb mnie",
                             },
                             {
                                 id: 3,
