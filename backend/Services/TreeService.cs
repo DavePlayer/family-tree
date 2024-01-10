@@ -1,17 +1,30 @@
 ﻿using family_tree_API.Dto;
 using family_tree_API.Models;
+using System;
 using System.Security.Claims;
+
+//DONE
+//dodawanie drzewa działa
+//usuwanie drzewa po id działa, nie wiem jak nody ktore były do tego drzewa itd
+
+//TO DO
+//zmiana nazwy drzewa
+//nie pozwolenie dwoch drzew o tej samej nazwie (chyba ze ma byc to feature)
+//
+//....
+
 
 namespace family_tree_API.Services
 {
-    public interface ITreeService {
+    public interface ITreeService
+    {
         FamilyTree AddFamilyTree(FamilyTreeDto dto);
 
         List<FamilyTree> GetUserFamilyTrees();
 
         Boolean DeleteTreeById(String treeId);
     }
-    public class TreeService:ITreeService
+    public class TreeService : ITreeService
     {
         private readonly FamilyTreeContext _context;
         private readonly IHttpContextAccessor _contextAccessor;
@@ -23,11 +36,13 @@ namespace family_tree_API.Services
         }
 
 
+        //nie dodaje id drzewa
         FamilyTree ITreeService.AddFamilyTree(FamilyTreeDto dto)
         {
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             FamilyTree tree = new FamilyTree()
             {
+                Id = Guid.NewGuid(),
                 UserId = Guid.Parse(userId),
                 Name = dto.Name,
                 ImgUrl = dto.ImgUrl
@@ -54,6 +69,7 @@ namespace family_tree_API.Services
             if (member != null)
             {
                 _context.FamilyMembers.Remove(member);
+                _context.SaveChanges();
             }
         }
         private void deleteConnectionByNodeId(String nodeId)
@@ -62,6 +78,7 @@ namespace family_tree_API.Services
             if (connections.Count > 0)
             {
                 _context.Connections.RemoveRange(connections);
+                _context.SaveChanges();
             }
         }
 
@@ -76,6 +93,7 @@ namespace family_tree_API.Services
                     deleteConnectionByNodeId(node.Id.ToString());
                     deleteFamilyMemberById(node.FamilyMember.ToString());
                     _context.Nodes.Remove(node);
+                    _context.SaveChanges();
                 }
             }
         }
@@ -92,6 +110,7 @@ namespace family_tree_API.Services
             {
                 deleteNodesByTreeId(treeId);
                 _context.FamilyTrees.Remove(tree);
+                _context.SaveChanges();
                 return true;
             }
             return false;

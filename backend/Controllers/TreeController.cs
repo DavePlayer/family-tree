@@ -18,9 +18,6 @@ namespace family_tree_API.Controllers
             _treeService = treeService;
         }
 
-
-
-
         [HttpGet("gettrees")]
         public IActionResult GetUserFamilyTrees()
         {
@@ -36,7 +33,7 @@ namespace family_tree_API.Controllers
             return BadRequest();
         }
 
-        [HttpDelete("addtree")]
+        [HttpPost("addtree")]
         public IActionResult AddTree([FromBody] FamilyTreeDto dto)
         {
             
