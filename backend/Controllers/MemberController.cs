@@ -1,4 +1,5 @@
 ﻿using family_tree_API.Dto;
+using family_tree_API.Models;
 using family_tree_API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -36,7 +37,7 @@ namespace family_tree_API.Controllers
         [HttpPost("addfamilymember")]
         public IActionResult AddFamilyMember([FromBody] FamilyMemberDto dto)
         {
-            return Ok("Brak implemetnacj");
+            return Json(_memberService.addFamilyMember( dto));
         }
 
     }

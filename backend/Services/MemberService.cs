@@ -7,7 +7,7 @@ namespace family_tree_API.Services
     public interface IMemberService
     {
         public List<FamilyMember> GetUserFamilyMembers();
-        public FamilyMember AddFamilyMember(FamilyMemberDto dto);
+        public FamilyMember addFamilyMember(FamilyMemberDto dto);
         public Boolean DeleteMember(String personId);
     }
     public class MemberService:IMemberService
@@ -21,7 +21,7 @@ namespace family_tree_API.Services
             _contextAccessor = contextAccessor;
         }
 
-        public FamilyMember AddFamilyMember(FamilyMemberDto dto)
+        public FamilyMember addFamilyMember(FamilyMemberDto dto)
         {
 
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
