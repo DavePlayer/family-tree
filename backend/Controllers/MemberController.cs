@@ -23,6 +23,8 @@ namespace family_tree_API.Controllers
         {
             return Json(_memberService.GetUserFamilyMembers());
         }
+
+
         [HttpDelete("deletefamilymember")]
         public IActionResult DeleteFamilyMember(String id)
         {
@@ -40,5 +42,10 @@ namespace family_tree_API.Controllers
             return Json(_memberService.addFamilyMember( dto));
         }
 
+        [HttpPost("editfamilymember")]
+        public IActionResult editFamilyMember([FromBody] FamilyMember fm)
+        {
+            return Json(_memberService.editFamilyMember(fm));
+        }
     }
 }

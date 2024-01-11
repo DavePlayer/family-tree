@@ -9,6 +9,7 @@ namespace family_tree_API.Services
         public List<FamilyMember> GetUserFamilyMembers();
         public FamilyMember addFamilyMember(FamilyMemberDto dto);
         public Boolean DeleteMember(String personId);
+        public FamilyMember editFamilyMember(FamilyMember familyMember);
     }
     public class MemberService:IMemberService
     {
@@ -83,6 +84,20 @@ namespace family_tree_API.Services
             return UserFamilyMembers;
         }
 
+        FamilyMember IMemberService.editFamilyMember(FamilyMember familyMember)
+        {
+            string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            FamilyMember fm = _context.FamilyMembers.Where(f=> f.Id == familyMember.Id && f.UserId.ToString() == userId ).FirstOrDefault();
+            if (fm == null) {
+                throw new Exception("This user has no such family member");  
+            }
+
+
+            _context.FamilyMembers.Update(familyMember);
+            _context.SaveChanges();
+
+            return familyMember;
+        } 
     }
 }
