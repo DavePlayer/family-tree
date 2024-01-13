@@ -22,5 +22,11 @@ namespace family_tree_API.Controllers
         {
             return Ok(_nodeService.AddNode(dto));
         }
+
+        [HttpPost("editnode")]
+        public IActionResult editNode([FromBody] Models.Node node)
+        {
+            return Ok(_nodeService.editNode(node));
+        }
     }
 }

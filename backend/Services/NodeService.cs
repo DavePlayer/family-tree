@@ -8,6 +8,7 @@ namespace family_tree_API.Services
     public interface INodeService {
 
         public Node AddNode(NodeDto dto);
+        public Node editNode(Node node);
 
     }
     public class NodeService : INodeService
@@ -23,7 +24,7 @@ namespace family_tree_API.Services
         }
 
 
-        public Node AddNode(NodeDto dto)
+        Node INodeService.AddNode(NodeDto dto)
         {
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -51,5 +52,20 @@ namespace family_tree_API.Services
             return node;
         }
 
+        Node INodeService.editNode(Node node) {
+
+            string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            FamilyMember? fm = _context.FamilyMembers.Where(f=> f.Id == node.FamilyMember && f.UserId.ToString() == userId).FirstOrDefault();
+
+            if(fm == null) {
+                throw new Exception("There is no family member that node refers to");
+            }
+
+            _context.Nodes.Update(node);
+            _context.SaveChanges();
+
+            return node;
+        }
     }
 }
