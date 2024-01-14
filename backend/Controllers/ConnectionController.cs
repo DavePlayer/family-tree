@@ -21,11 +21,15 @@ namespace family_tree_API.Controllers
         [HttpPost("addconnection")]
         public IActionResult AddConnection([FromBody] ConnectionDto dto)
         {
-            _connectionService.AddConnection(dto);
-            return Ok();
-
-
+            
+            return Ok(_connectionService.AddConnection(dto));
         }
 
+        [HttpPost("editconnection")]
+        public IActionResult editConnection([FromBody] Models.Connection con)
+        {
+            
+            return Json(_connectionService.editConnection(con));
+        }
     }
 }

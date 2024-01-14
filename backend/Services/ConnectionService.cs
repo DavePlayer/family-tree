@@ -7,6 +7,7 @@ namespace family_tree_API.Services
     public interface IConnectionService {
 
         public Connection AddConnection(ConnectionDto dto);
+        public Connection editConnection(Connection con);
 
     }
 
@@ -24,7 +25,7 @@ namespace family_tree_API.Services
 
 
 
-        public Connection AddConnection(ConnectionDto dto)
+        Connection IConnectionService.AddConnection(ConnectionDto dto)
         {
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -61,6 +62,35 @@ namespace family_tree_API.Services
             _context.SaveChanges();
 
             return connection;
+        }
+
+        Connection IConnectionService.editConnection(Connection con)
+        {
+            string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            FamilyTree? famTree = _context.FamilyTrees.Where(t => (t.Id == con.FamilyTreeId && t.UserId.ToString() == userId)).FirstOrDefault();
+            Node? nodeToId = _context.Nodes.Where(n => n.Id == con.To).FirstOrDefault();
+            Node? nodeFromId = _context.Nodes.Where(n => n.Id == con.From).FirstOrDefault();
+
+            if (famTree == null)
+            {
+                throw new Exception("Tee does not exist or it does not belong to this user");
+            }
+            if (nodeToId == null || nodeFromId == null)
+            {
+                throw new Exception("One or both family members does not exist");
+            }
+            // sprawdza członków rodziny 
+            FamilyMember? to = _context.FamilyMembers.Where(m => (m.Id == nodeToId.FamilyMember && m.UserId.ToString() == userId)).FirstOrDefault();
+            FamilyMember? from = _context.FamilyMembers.Where(m => (m.Id == nodeFromId.FamilyMember && m.UserId.ToString() == userId)).FirstOrDefault();
+
+            if (to == null || from == null)
+            {
+                throw new Exception("One or both family members does not belong to this user");
+            }
+            _context.Connections.Update(con);
+            _context.SaveChanges();
+            return con;
         }
     }
 }
