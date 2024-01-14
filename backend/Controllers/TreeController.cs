@@ -40,5 +40,13 @@ namespace family_tree_API.Controllers
             return Ok(_treeService.AddFamilyTree(dto));
             
         }
+
+        [HttpPost("edittree")]
+        public IActionResult editTree([FromBody] Models.FamilyTree tree)
+        {
+
+            return Json(_treeService.editTree(tree));
+
+        }
     }
 }

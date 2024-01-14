@@ -23,6 +23,8 @@ namespace family_tree_API.Services
         List<FamilyTree> GetUserFamilyTrees();
 
         Boolean DeleteTreeById(String treeId);
+
+        FamilyTree editTree(FamilyTree familyTree);
     }
     public class TreeService : ITreeService
     {
@@ -116,7 +118,22 @@ namespace family_tree_API.Services
             return false;
         }
 
+        FamilyTree ITreeService.editTree(FamilyTree familyTree)
+        {
+            string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            FamilyTree? tree = _context.FamilyTrees.Where(m => m.Id == familyTree.Id && m.UserId.ToString() == userId).FirstOrDefault();
+
+            if (tree == null)
+            {
+                throw new Exception("There is no such family tree");
+            }
+
+            _context.FamilyTrees.Update(familyTree);
+            _context.SaveChanges();
+
+            return familyTree;
+        }
 
 
     }
