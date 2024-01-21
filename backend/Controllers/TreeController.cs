@@ -36,9 +36,9 @@ namespace family_tree_API.Controllers
         [HttpPost("addtree")]
         public IActionResult AddTree([FromBody] FamilyTreeDto dto)
         {
-            
+
             return Ok(_treeService.AddFamilyTree(dto));
-            
+
         }
 
         [HttpPost("edittree")]
@@ -47,6 +47,12 @@ namespace family_tree_API.Controllers
 
             return Json(_treeService.editTree(tree));
 
+        }
+        [AllowAnonymous]
+        [HttpGet("test")]
+        public string Test()
+        {
+            return ("test");
         }
     }
 }
