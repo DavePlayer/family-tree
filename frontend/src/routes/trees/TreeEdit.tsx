@@ -1,17 +1,25 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { AppDispatch, RootState } from "../../redux/store";
+import { AppDispatch, RootState, useAppDispatch } from "../../redux/store";
 import { fetchEditerTreeData } from "../../redux/slices/treesSlice/cases/tests/fetchEditTreeData";
 import { useEffect, useRef, useState } from "react";
+import userImg from "../../assets/user_image.png";
 import * as d3 from "d3";
 import { useContainerDimensions } from "../../globalHooks/useContainerDimensions.ts";
-import { EditedTree, FamilyMember } from "../../redux/slices/treesSlice/editedTreeSlice.ts";
+import {
+    EditedTree,
+    FamilyMember,
+    MouseMode,
+    setMouseMode,
+} from "../../redux/slices/treesSlice/editedTreeSlice.ts";
 import Popup from "reactjs-popup";
 import { FamilyMemberInfo } from "../../globalComponents/modals/FamilyMemberInfo.tsx";
+import { createFamilyMember } from "../../redux/slices/treesSlice/cases/tests/craeteFamilyMember.ts";
+import { createNewNode } from "../../redux/slices/treesSlice/cases/tests/createNewNode.ts";
 
 export const TreeEdit = () => {
     const params = useParams();
-    const dispatch = useDispatch<AppDispatch>();
+    const dispatch = useAppDispatch();
     const editedTree = useSelector((root: RootState) => root.editedTree);
     const [selectedFamMamber, setSelectedFamMember] = useState<number | null>(null);
     const latestEditedTree = useRef<EditedTree>(editedTree);
@@ -28,14 +36,15 @@ export const TreeEdit = () => {
         const labelSize = 15;
 
         const focus = d3.select(".plot-area");
-        let nodesData = latestEditedTree.current.nodes
-            .map((d) => ({
-                x: d.posX,
-                y: d.posY,
-                ...d,
-            }))
-            // so family members will be rendered first and be on top of nodes
-            .sort((a, _) => (a.famMemId !== null ? 1 : 0));
+        let nodesData = latestEditedTree.current.nodes.map((d) => ({
+            x: d.posX,
+            y: d.posY,
+            ...d,
+        }));
+
+        // so family members will be rendered first and be on top of nodes
+        nodesData.sort((a, _) => (a.famMemId !== null ? 1 : 0));
+
         const linksData = latestEditedTree.current.connections.map((d) => ({
             index: d.id,
             target: d.to,
@@ -120,6 +129,7 @@ export const TreeEdit = () => {
         const nodeEnter = node
             .enter()
             .append("g")
+            .attr("id", (d) => `node${d.id}`)
             .on("mouseenter", nodeMouseover)
             .on("mouseleave", nodeMouseLeave)
             .on("click", nodeMouseClick)
@@ -143,12 +153,17 @@ export const TreeEdit = () => {
         // inserting images into family member nodes
         nodeEnter
             .append("image")
+            // @ts-ignore
             .attr("xlink:href", (d) => {
                 if (d.famMemId) {
                     const [familyMember] = latestEditedTree.current.members.filter(
                         (member) => member.id === d.famMemId
                     );
-                    return familyMember ? familyMember.img_url : "#";
+                    return familyMember
+                        ? familyMember.img_url
+                            ? familyMember.img_url
+                            : userImg
+                        : "#";
                 }
                 return "#";
             })
@@ -159,7 +174,7 @@ export const TreeEdit = () => {
             })
             .attr("clip-path", (d) => `url(#clipPath${d.id})`)
             .on("error", function () {
-                d3.select(this).attr("xlink:href", "path-to-your-fallback-image.jpg");
+                d3.select(this).attr("xlink:href", "#");
             });
 
         nodeEnter
@@ -292,8 +307,58 @@ export const TreeEdit = () => {
                 y: number;
             }
         ) {
-            setSelectedFamMember(d.famMemId);
+            if (latestEditedTree.current.MouseMode == MouseMode.Delete) {
+                console.log("removing node???");
+            } else {
+                setSelectedFamMember(d.famMemId);
+            }
         }
+
+        let shadow = svg.select("#shadow-circle");
+        if (shadow.empty()) {
+            shadow = svg
+                .append("circle")
+                .attr("id", "shadow-circle")
+                .attr("r", imageSize / 2) // Adjust the radius as needed
+                .style("fill", "gray") as any; // Adjust the color as needed
+        }
+
+        svg.on("mousemove", function (event) {
+            const [mouseX, mouseY] = d3.pointer(event);
+            if (latestEditedTree.current.MouseMode == MouseMode.Create) {
+                shadow.attr("cx", mouseX).attr("cy", mouseY);
+                shadow.style("opacity", 0.5);
+            } else {
+                shadow.style("opacity", 0.0);
+            }
+        });
+
+        svg.on("click", function (event: any) {
+            if (latestEditedTree.current.MouseMode == MouseMode.Create) {
+                shadow.style("opacity", 0.0);
+                dispatch(setMouseMode(MouseMode.None));
+                const newId = Math.floor(Math.random() * 500000);
+                const [mouseX, mouseY] = d3.pointer(event, focus.node());
+                dispatch(
+                    createFamilyMember({
+                        id: newId,
+                        address: "",
+                        status: "alive",
+                        name: "New member",
+                        deathTime: null,
+                    })
+                ).then((d) => {
+                    dispatch(
+                        createNewNode({
+                            famMemId: (d.payload as FamilyMember).id,
+                            id: newId,
+                            posX: mouseX - imageSize / 2,
+                            posY: mouseY - imageSize / 2,
+                        })
+                    );
+                });
+            }
+        });
 
         //defining zooming functionality
         function zoomed({ transform }: any) {
@@ -332,6 +397,7 @@ export const TreeEdit = () => {
                     return null;
                 });
         };
+        simulation.on("tick", updateNodes);
 
         // defining button to reset position
         const resetPos = () => {
@@ -341,8 +407,6 @@ export const TreeEdit = () => {
             svg.call(zoom as any);
         };
         d3.select("#resetButton").on("click", resetPos);
-
-        simulation.on("tick", updateNodes);
 
         return () => {
             // Cleanup or stop simulation if needed

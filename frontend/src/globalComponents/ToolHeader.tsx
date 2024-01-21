@@ -3,14 +3,14 @@ import LogoSvg from "./../assets/logo.svg?react";
 import FeatherSvg from "./../assets/pen.svg?react";
 import PenSvg from "./../assets/pen2.svg?react";
 import UserSvg from "./../assets/user.svg?react";
-import { AppDispatch, RootState } from "../redux/store";
+import { AppDispatch, RootState, useAppDispatch } from "../redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { MouseMode, setMouseMode } from "../redux/slices/treesSlice/editedTreeSlice.ts";
 
 export const ToolHeader = () => {
     const navigate = useNavigate();
     const editedTree = useSelector((root: RootState) => root.editedTree);
-    const dispatch = useDispatch<AppDispatch>();
+    const dispatch = useAppDispatch();
     return (
         <>
             <header className="header fixed z-30">

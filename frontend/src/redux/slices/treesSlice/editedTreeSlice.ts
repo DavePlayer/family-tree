@@ -3,6 +3,8 @@ import { Id, toast } from "react-toastify";
 import { Tree } from "./treeSlice.ts";
 import { fetchEditerTreeData } from "./cases/tests/fetchEditTreeData.ts";
 import { updateFamilyMemberData } from "./cases/tests/updateFamilyMemberData.ts";
+import { createFamilyMember } from "./cases/tests/craeteFamilyMember.ts";
+import { createNewNode } from "./cases/tests/createNewNode.ts";
 
 enum status {
     pending,
@@ -12,13 +14,13 @@ enum status {
 }
 
 export interface FamilyMember {
-    img_url: string;
     id: number;
     name: string;
     status: string;
     deathTime: Date | null;
     address: string;
     additionalData?: string;
+    img_url?: string;
 }
 
 export interface NodeConnection {
@@ -146,6 +148,72 @@ export const treesSlice = createSlice({
             if (state && state.toastId)
                 toast.update(state.toastId, {
                     render: "failed to update member",
+                    type: "error",
+                    isLoading: false,
+                    autoClose: 2000,
+                });
+            console.error(`${payload.error.code}: ${payload.error.message}`);
+        });
+
+        // ---------------------
+        // Create Family Member
+        // ---------------------
+        builder.addCase(createFamilyMember.pending, (state) => {
+            state.toastId = toast.loading("creating Family member", {
+                autoClose: 5000,
+                closeButton: true,
+                closeOnClick: true,
+                toastId: "UpdateFamMember",
+            });
+            state.status = status.loading;
+        });
+        builder.addCase(createFamilyMember.fulfilled, (state, action) => {
+            if (state.toastId)
+                toast.update(state.toastId, {
+                    render: "created member successfully",
+                    type: "success",
+                    isLoading: false,
+                    autoClose: 2000,
+                });
+            return { ...state, members: [...state.members, action.payload] };
+        });
+        builder.addCase(createFamilyMember.rejected, (state, payload) => {
+            if (state && state.toastId)
+                toast.update(state.toastId, {
+                    render: "failed to create member",
+                    type: "error",
+                    isLoading: false,
+                    autoClose: 2000,
+                });
+            console.error(`${payload.error.code}: ${payload.error.message}`);
+        });
+
+        // ---------------------
+        // Create new Node
+        // ---------------------
+        builder.addCase(createNewNode.pending, (state) => {
+            state.toastId = toast.loading("craeting new node", {
+                autoClose: 5000,
+                closeButton: true,
+                closeOnClick: true,
+                toastId: "createNode",
+            });
+            state.status = status.loading;
+        });
+        builder.addCase(createNewNode.fulfilled, (state, action) => {
+            if (state.toastId)
+                toast.update(state.toastId, {
+                    render: "created new node successfully",
+                    type: "success",
+                    isLoading: false,
+                    autoClose: 2000,
+                });
+            return { ...state, nodes: [...state.nodes, action.payload] };
+        });
+        builder.addCase(createNewNode.rejected, (state, payload) => {
+            if (state && state.toastId)
+                toast.update(state.toastId, {
+                    render: "failed to create new node",
                     type: "error",
                     isLoading: false,
                     autoClose: 2000,

@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import logger from "redux-logger";
 import treesSlice from "./slices/treesSlice/treeSlice.ts";
 import editedTreeSlice from "./slices/treesSlice/editedTreeSlice.ts";
+import { useDispatch } from "react-redux";
 
 export const store = configureStore({
     reducer: { trees: treesSlice, editedTree: editedTreeSlice },
@@ -11,3 +12,4 @@ export const store = configureStore({
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
+export const useAppDispatch: () => AppDispatch = useDispatch;
