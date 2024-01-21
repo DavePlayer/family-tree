@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { Id, toast } from "react-toastify";
 import { Tree } from "./treeSlice.ts";
 import { fetchEditerTreeData } from "./cases/tests/fetchEditTreeData.ts";
@@ -35,6 +35,14 @@ export interface Node {
     famMemId: number | null;
 }
 
+export enum MouseMode {
+    None,
+    Create,
+    Link,
+    RmLink,
+    Delete,
+}
+
 export interface EditedTree {
     tree: Tree | null;
     status: status;
@@ -42,6 +50,7 @@ export interface EditedTree {
     nodes: Array<Node>;
     connections: Array<NodeConnection>;
     toastId?: Id;
+    MouseMode: MouseMode;
 }
 
 // Define the initial state using that type
@@ -52,6 +61,7 @@ const initialState: EditedTree = {
     nodes: [],
     connections: [],
     toastId: "getEfitedTree",
+    MouseMode: MouseMode.None,
 };
 
 export const treesSlice = createSlice({
@@ -61,6 +71,10 @@ export const treesSlice = createSlice({
         // incrementByAmount: (state, action: PayloadAction<number>) => {
         //     state.value += action.payload;
         // },
+        setMouseMode: (state, action: PayloadAction<MouseMode>) => {
+            console.log("changing mouse mode: ", action.payload);
+            state.MouseMode = action.payload;
+        },
     },
     extraReducers: (builder) => {
         // ---------------------
@@ -141,6 +155,6 @@ export const treesSlice = createSlice({
     },
 });
 
-// export const { incrementByAmount } = counterSlice.actions;
+export const { setMouseMode } = treesSlice.actions;
 
 export default treesSlice.reducer;
