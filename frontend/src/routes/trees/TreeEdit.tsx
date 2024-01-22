@@ -13,6 +13,7 @@ import {
     setMouseMode,
     Node,
     setSelectedNode,
+    resetSelection,
 } from "../../redux/slices/treesSlice/editedTreeSlice.ts";
 import Popup from "reactjs-popup";
 import { FamilyMemberInfo } from "../../globalComponents/modals/FamilyMemberInfo.tsx";
@@ -21,6 +22,7 @@ import { createNewNode } from "../../redux/slices/treesSlice/cases/tests/createN
 import { removeNode } from "../../redux/slices/treesSlice/cases/tests/RemoveNode.ts";
 import { removeConnection } from "../../redux/slices/treesSlice/cases/tests/removeConnection.ts";
 import { toast } from "react-toastify";
+import { createConnection } from "../../redux/slices/treesSlice/cases/tests/createConnection.ts";
 
 export const TreeEdit = () => {
     const params = useParams();
@@ -61,13 +63,13 @@ export const TreeEdit = () => {
         // creating entire chart
         let simulation = d3
             .forceSimulation(nodesData)
-            .force("charge", d3.forceManyBody().strength(-150))
+            .force("charge", d3.forceManyBody().strength(50))
             .force("x", d3.forceX())
             .force("y", d3.forceY());
 
         const svg = d3.select(mapRef.current);
 
-        // creating conection between nodes
+        // creating connection between nodes
         const links = focus.selectAll(".link").data(linksData, (d: any) => d.id);
 
         // Handle the exit selection
@@ -75,7 +77,9 @@ export const TreeEdit = () => {
 
         // Handle the enter selection
         const linkEnter = links
+            .lower()
             .enter()
+            .append("g")
             .append("path")
             .attr("class", "link")
             .style("stroke-width", 1)
@@ -132,6 +136,7 @@ export const TreeEdit = () => {
         );
 
         const nodeEnter = node
+            .raise()
             .enter()
             .append("g")
             .attr("id", (d) => `node${d.id}`)
@@ -293,14 +298,54 @@ export const TreeEdit = () => {
             if (latestEditedTree.current.MouseMode == MouseMode.Delete) {
                 dispatch(removeNode(d));
             } else if (latestEditedTree.current.MouseMode == MouseMode.RmLink) {
-                console.log("mouse in rmLink and clicked on node", d);
                 const selected = latestEditedTree.current.nodes.find((o) => o.selected);
                 if (!selected) {
                     console.log("setting new node: ", d.id);
                     dispatch(setSelectedNode(d));
                 } else {
+                    if (d.id == selected.id) {
+                        dispatch(resetSelection());
+                        return toast.error("can't remove connection from yourself");
+                    }
+                    const connection = latestEditedTree.current.connections.find(
+                        (o) =>
+                            (o.from === selected.id && o.to === d.id) ||
+                            (o.from === d.id && o.to === selected.id)
+                    );
+                    if (!connection) {
+                        dispatch(resetSelection());
+                        return toast.error("can't remove not existing connection");
+                    } else {
+                        console.log("found connection to be removed: ", connection);
+                    }
                     console.log("removing connection from", selected.id, d.id);
-                    if (d.id != selected.id) dispatch(removeConnection([selected, d]));
+                    dispatch(removeConnection([selected, d]));
+                    dispatch(resetSelection());
+                }
+            } else if (latestEditedTree.current.MouseMode == MouseMode.Link) {
+                const selected = latestEditedTree.current.nodes.find((o) => o.selected);
+                if (!selected) {
+                    console.log("setting new node: ", d.id);
+                    dispatch(setSelectedNode(d));
+                } else {
+                    if (d.id == selected.id) {
+                        dispatch(resetSelection());
+                        return toast.error("can't create connection with yourself");
+                    }
+                    const connection = latestEditedTree.current.connections.find(
+                        (o) =>
+                            (o.from === selected.id && o.to === d.id) ||
+                            (o.from === d.id && o.to === selected.id)
+                    );
+                    if (connection) {
+                        dispatch(resetSelection());
+                        return toast.error("connection already exists");
+                    } else {
+                        console.log("found connection to be removed: ", connection);
+                    }
+                    console.log("removing connection from", selected.id, d.id);
+                    dispatch(createConnection([selected, d]));
+                    dispatch(resetSelection());
                 }
             } else {
                 setSelectedFamMember(d.famMemId);
@@ -318,7 +363,10 @@ export const TreeEdit = () => {
 
         svg.on("mousemove", function (event) {
             const [mouseX, mouseY] = d3.pointer(event);
-            if (latestEditedTree.current.MouseMode == MouseMode.Create) {
+            if (
+                latestEditedTree.current.MouseMode == MouseMode.Create ||
+                latestEditedTree.current.MouseMode == MouseMode.CreateNode
+            ) {
                 shadow.attr("cx", mouseX).attr("cy", mouseY);
                 shadow.style("opacity", 0.5);
             } else {
@@ -327,29 +375,50 @@ export const TreeEdit = () => {
         });
 
         svg.on("click", function (event: any) {
-            if (latestEditedTree.current.MouseMode == MouseMode.Create) {
+            if (
+                latestEditedTree.current.MouseMode == MouseMode.Create ||
+                latestEditedTree.current.MouseMode == MouseMode.CreateNode
+            ) {
                 shadow.style("opacity", 0.0);
                 dispatch(setMouseMode(MouseMode.None));
                 const newId = Math.floor(Math.random() * 500000);
                 const [mouseX, mouseY] = d3.pointer(event, focus.node());
-                dispatch(
-                    createFamilyMember({
-                        id: newId,
-                        address: "",
-                        status: "alive",
-                        name: "New member",
-                        deathTime: null,
-                    })
-                ).then((d) => {
+                if (latestEditedTree.current.MouseMode == MouseMode.Create) {
+                    dispatch(
+                        createFamilyMember({
+                            id: newId,
+                            address: "",
+                            status: "alive",
+                            name: "New member",
+                            deathTime: null,
+                        })
+                    ).then((d) => {
+                        dispatch(
+                            createNewNode({
+                                famMemId: (d.payload as FamilyMember).id,
+                                id: newId,
+                                posX: mouseX - imageSize / 2,
+                                posY: mouseY - imageSize / 2,
+                            })
+                        )
+                            .then(() => shadow.attr("cx", -500).attr("cy", -500))
+                            .catch(() => shadow.attr("cx", -500).attr("cy", -500));
+                    });
+                    dispatch(resetSelection());
+                }
+                if (latestEditedTree.current.MouseMode == MouseMode.CreateNode) {
                     dispatch(
                         createNewNode({
-                            famMemId: (d.payload as FamilyMember).id,
+                            famMemId: null,
                             id: newId,
-                            posX: mouseX - imageSize / 2,
-                            posY: mouseY - imageSize / 2,
+                            posX: mouseX - nodeSize / 2,
+                            posY: mouseY - nodeSize / 2,
                         })
-                    );
-                });
+                    )
+                        .then(() => shadow.attr("cx", -500).attr("cy", -500))
+                        .catch(() => shadow.attr("cx", -500).attr("cy", -500));
+                    dispatch(resetSelection());
+                }
             }
         });
 
@@ -379,9 +448,28 @@ export const TreeEdit = () => {
             // Update SVG elements based on simulation state
             const members = latestEditedTree.current.members;
 
+            svg.selectAll(".link")
+                // .lower()
+                .attr("d", (d: any) => {
+                    const source = nodesData.find((node) => node.id === d.from);
+                    const target = nodesData.find((node) => node.id === d.to);
+
+                    if (source && target) {
+                        return `M${
+                            source.posX + (source.famMemId ? imageSize / 2 : nodeSize / 2)
+                        },${source.posY + (source.famMemId ? imageSize / 2 : nodeSize / 2)} L${
+                            target.posX + (target.famMemId ? imageSize / 2 : nodeSize / 2)
+                        },${target.posY + (target.famMemId ? imageSize / 2 : nodeSize / 2)}`;
+                    } else {
+                        // Handle cases where source or target is not found
+                        return "";
+                    }
+                });
+
             svg.selectAll(".nodes")
                 .attr("x", (d: any) => d.x)
                 .attr("y", (d: any) => d.y)
+                // .raise()
                 .select("text")
                 .text((d: any) => {
                     const member = members.find((mem) => mem.id == d.famMemId);

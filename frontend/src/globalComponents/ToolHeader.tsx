@@ -4,6 +4,7 @@ import UserCreateSvg from "./../assets/userCreate.svg?react";
 import UserRemoveSvg from "./../assets/userRemove.svg?react";
 import LinkCreateSvg from "./../assets/link.svg?react";
 import LinkRemoveSvg from "./../assets/destroyLink.svg?react";
+import NodeCreateSvg from "./../assets/nodeCreate.svg?react";
 import { RootState, useAppDispatch } from "../redux/store";
 import { useSelector } from "react-redux";
 import { MouseMode, setMouseMode } from "../redux/slices/treesSlice/editedTreeSlice.ts";
@@ -17,6 +18,22 @@ export const ToolHeader = () => {
             <header className="header fixed z-30">
                 <div className="flex items-center justify-center">
                     <LogoSvg className="w-[50px] h-auto ml-[-0.3em]" />
+                    <div
+                        className="p-1.5 bg-default-color rounded-full cursor-pointer ml-4"
+                        onClick={() =>
+                            editedTree.MouseMode != MouseMode.CreateNode
+                                ? dispatch(setMouseMode(MouseMode.CreateNode))
+                                : dispatch(setMouseMode(MouseMode.None))
+                        }
+                    >
+                        <NodeCreateSvg
+                            className={`${
+                                editedTree.MouseMode == MouseMode.CreateNode
+                                    ? "fill-orange"
+                                    : "fill-secondary-color"
+                            }`}
+                        />
+                    </div>
                     <div
                         className="p-1.5 bg-default-color rounded-full cursor-pointer ml-4"
                         onClick={() =>

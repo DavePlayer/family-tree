@@ -7,6 +7,7 @@ import { createFamilyMember } from "./cases/tests/craeteFamilyMember.ts";
 import { createNewNode } from "./cases/tests/createNewNode.ts";
 import { removeNode } from "./cases/tests/RemoveNode.ts";
 import { removeConnection } from "./cases/tests/removeConnection.ts";
+import { createConnection } from "./cases/tests/createConnection.ts";
 
 enum status {
     pending,
@@ -45,6 +46,7 @@ export enum MouseMode {
     Link,
     RmLink,
     Delete,
+    CreateNode,
 }
 
 export interface EditedTree {
@@ -91,7 +93,15 @@ export const treesSlice = createSlice({
                 o.id === action.payload.id ? { ...o, selected: true } : o
             );
 
-            console.log("Setting selection to node:", action.payload.id, newNodes);
+            state.nodes = newNodes;
+        },
+        resetSelection: (state) => {
+            const newNodes = state.nodes.map((o) => {
+                return {
+                    ...o,
+                    selected: false,
+                };
+            });
 
             state.nodes = newNodes;
         },
@@ -296,7 +306,7 @@ export const treesSlice = createSlice({
         // ---------------------
         builder.addCase(removeConnection.pending, (state, action) => {
             // toast.dismiss(state.toastId);
-            state.toastId = toast.loading("removing node with its links", {
+            state.toastId = toast.loading("deleting connection", {
                 autoClose: 5000,
                 closeButton: true,
                 closeOnClick: true,
@@ -307,7 +317,7 @@ export const treesSlice = createSlice({
         builder.addCase(removeConnection.fulfilled, (state, action) => {
             if (state.toastId)
                 toast.update(`removeConnection${action.meta.requestId}`, {
-                    render: "removed nodes successfully",
+                    render: "removed connection successfully",
                     type: "success",
                     isLoading: false,
                     autoClose: 2000,
@@ -324,6 +334,7 @@ export const treesSlice = createSlice({
                 return {
                     ...o,
                     selected: false,
+                    MouseMode: MouseMode.None,
                 };
             });
             return { ...state, connections: newConnections, nodes: newNodes };
@@ -331,7 +342,52 @@ export const treesSlice = createSlice({
         builder.addCase(removeConnection.rejected, (state, payload) => {
             if (state && state.toastId)
                 toast.update(state.toastId, {
-                    render: "failed to remove node",
+                    render: "failed to remove connection",
+                    type: "error",
+                    isLoading: false,
+                    autoClose: 2000,
+                });
+            console.error(`${payload.error.code}: ${payload.error.message}`);
+        });
+
+        // ---------------------
+        // create Connection
+        // ---------------------
+        builder.addCase(createConnection.pending, (state, action) => {
+            // toast.dismiss(state.toastId);
+            state.toastId = toast.loading("creating new connection", {
+                autoClose: 5000,
+                closeButton: true,
+                closeOnClick: true,
+                toastId: `removeConnection${action.meta.requestId}`,
+            });
+            state.status = status.loading;
+        });
+        builder.addCase(createConnection.fulfilled, (state, action) => {
+            if (state.toastId)
+                toast.update(`removeConnection${action.meta.requestId}`, {
+                    render: "created connection successfully",
+                    type: "success",
+                    isLoading: false,
+                    autoClose: 2000,
+                });
+            const newNodes = state.nodes.map((o) => {
+                return {
+                    ...o,
+                    selected: false,
+                };
+            });
+            return {
+                ...state,
+                connections: [...state.connections, action.payload],
+                nodes: newNodes,
+                MouseMode: MouseMode.None,
+            };
+        });
+        builder.addCase(createConnection.rejected, (state, payload) => {
+            if (state && state.toastId)
+                toast.update(state.toastId, {
+                    render: "failed to create connection",
                     type: "error",
                     isLoading: false,
                     autoClose: 2000,
@@ -341,6 +397,6 @@ export const treesSlice = createSlice({
     },
 });
 
-export const { setMouseMode, setSelectedNode } = treesSlice.actions;
+export const { setMouseMode, setSelectedNode, resetSelection } = treesSlice.actions;
 
 export default treesSlice.reducer;
