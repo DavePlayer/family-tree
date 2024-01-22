@@ -1,10 +1,11 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import LogoSvg from "./../assets/logo.svg?react";
-import FeatherSvg from "./../assets/pen.svg?react";
-import PenSvg from "./../assets/pen2.svg?react";
-import UserSvg from "./../assets/user.svg?react";
-import { AppDispatch, RootState, useAppDispatch } from "../redux/store";
-import { useDispatch, useSelector } from "react-redux";
+import UserCreateSvg from "./../assets/userCreate.svg?react";
+import UserRemoveSvg from "./../assets/userRemove.svg?react";
+import LinkCreateSvg from "./../assets/link.svg?react";
+import LinkRemoveSvg from "./../assets/destroyLink.svg?react";
+import { RootState, useAppDispatch } from "../redux/store";
+import { useSelector } from "react-redux";
 import { MouseMode, setMouseMode } from "../redux/slices/treesSlice/editedTreeSlice.ts";
 
 export const ToolHeader = () => {
@@ -19,32 +20,18 @@ export const ToolHeader = () => {
                     <div
                         className="p-1.5 bg-default-color rounded-full cursor-pointer ml-4"
                         onClick={() =>
-                            editedTree.MouseMode != MouseMode.Link
-                                ? dispatch(setMouseMode(MouseMode.Link))
-                                : dispatch(setMouseMode(MouseMode.None))
-                        }
-                    >
-                        <FeatherSvg className=" fill-secondary-color" />
-                    </div>
-                    <div
-                        className="bg-default-color rounded-full cursor-pointer ml-2"
-                        onClick={() =>
-                            editedTree.MouseMode != MouseMode.Link
-                                ? dispatch(setMouseMode(MouseMode.Link))
-                                : dispatch(setMouseMode(MouseMode.None))
-                        }
-                    >
-                        <PenSvg className=" fill-secondary-color" />
-                    </div>
-                    <div
-                        className="p-1.5 bg-default-color rounded-full cursor-pointer ml-2"
-                        onClick={() =>
                             editedTree.MouseMode != MouseMode.Create
                                 ? dispatch(setMouseMode(MouseMode.Create))
                                 : dispatch(setMouseMode(MouseMode.None))
                         }
                     >
-                        <UserSvg className=" fill-secondary-color" />
+                        <UserCreateSvg
+                            className={`${
+                                editedTree.MouseMode == MouseMode.Create
+                                    ? "fill-orange"
+                                    : "fill-secondary-color"
+                            }`}
+                        />
                     </div>
                     <div
                         className="p-1.5 bg-default-color rounded-full cursor-pointer ml-2"
@@ -54,7 +41,29 @@ export const ToolHeader = () => {
                                 : dispatch(setMouseMode(MouseMode.None))
                         }
                     >
-                        <button className="text-black">Delete</button>
+                        <UserRemoveSvg
+                            className={`${
+                                editedTree.MouseMode == MouseMode.Delete
+                                    ? "fill-orange"
+                                    : "fill-secondary-color"
+                            }`}
+                        />
+                    </div>
+                    <div
+                        className="p-1.5 bg-default-color rounded-full cursor-pointer ml-2"
+                        onClick={() =>
+                            editedTree.MouseMode != MouseMode.Link
+                                ? dispatch(setMouseMode(MouseMode.Link))
+                                : dispatch(setMouseMode(MouseMode.None))
+                        }
+                    >
+                        <LinkCreateSvg
+                            className={`${
+                                editedTree.MouseMode == MouseMode.Link
+                                    ? "fill-orange"
+                                    : "fill-secondary-color"
+                            }`}
+                        />
                     </div>
                     <div
                         className="p-1.5 bg-default-color rounded-full cursor-pointer ml-2"
@@ -64,7 +73,13 @@ export const ToolHeader = () => {
                                 : dispatch(setMouseMode(MouseMode.None))
                         }
                     >
-                        <button className="text-black">RM Link</button>
+                        <LinkRemoveSvg
+                            className={`${
+                                editedTree.MouseMode == MouseMode.RmLink
+                                    ? "fill-orange"
+                                    : "fill-secondary-color"
+                            }`}
+                        />
                     </div>
                 </div>
                 <h1 className="absolute z-[-1] l-0 w-full text-center">{editedTree.tree?.name}</h1>

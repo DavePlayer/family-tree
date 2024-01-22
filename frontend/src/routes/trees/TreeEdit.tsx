@@ -1,6 +1,6 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { AppDispatch, RootState, useAppDispatch } from "../../redux/store";
+import { RootState, useAppDispatch } from "../../redux/store";
 import { fetchEditerTreeData } from "../../redux/slices/treesSlice/cases/tests/fetchEditTreeData";
 import { useEffect, useRef, useState } from "react";
 import userImg from "../../assets/user_image.png";
@@ -11,11 +11,16 @@ import {
     FamilyMember,
     MouseMode,
     setMouseMode,
+    Node,
+    setSelectedNode,
 } from "../../redux/slices/treesSlice/editedTreeSlice.ts";
 import Popup from "reactjs-popup";
 import { FamilyMemberInfo } from "../../globalComponents/modals/FamilyMemberInfo.tsx";
 import { createFamilyMember } from "../../redux/slices/treesSlice/cases/tests/craeteFamilyMember.ts";
 import { createNewNode } from "../../redux/slices/treesSlice/cases/tests/createNewNode.ts";
+import { removeNode } from "../../redux/slices/treesSlice/cases/tests/RemoveNode.ts";
+import { removeConnection } from "../../redux/slices/treesSlice/cases/tests/removeConnection.ts";
+import { toast } from "react-toastify";
 
 export const TreeEdit = () => {
     const params = useParams();
@@ -216,7 +221,9 @@ export const TreeEdit = () => {
 
                 return "translate(" + (d.x + offset) + "," + (d.y + imageSize + labelSize) + ")";
             })
-            .style("fill", "#FD7900");
+            .style("fill", function (d) {
+                return d.selected ? "#fff" : "#FD7900";
+            });
 
         function nodeMouseover(
             this: any,
@@ -251,8 +258,6 @@ export const TreeEdit = () => {
                 const textWidth = tempText.getBBox().width;
                 const textHeight = tempText.getBBox().height;
 
-                console.log(titleToDisplay);
-
                 const offset = Math.round(imageSize / 2) - textWidth / 2;
 
                 // Remove the temporary text element
@@ -269,18 +274,7 @@ export const TreeEdit = () => {
                     .attr("fill-opacity", "1");
             }
         }
-        function nodeMouseLeave(
-            this: any,
-            _: any,
-            d: {
-                id: number;
-                posX: number;
-                posY: number;
-                famMemId: number | null;
-                x: number;
-                y: number;
-            }
-        ) {
+        function nodeMouseLeave(this: any, _: any, d: Node) {
             if (d.famMemId) {
                 const theNode = d3.select(this);
 
@@ -295,20 +289,19 @@ export const TreeEdit = () => {
             }
         }
 
-        function nodeMouseClick(
-            this: any,
-            _: any,
-            d: {
-                id: number;
-                posX: number;
-                posY: number;
-                famMemId: number | null;
-                x: number;
-                y: number;
-            }
-        ) {
+        function nodeMouseClick(this: any, _: any, d: Node & { selected: boolean }) {
             if (latestEditedTree.current.MouseMode == MouseMode.Delete) {
-                console.log("removing node???");
+                dispatch(removeNode(d));
+            } else if (latestEditedTree.current.MouseMode == MouseMode.RmLink) {
+                console.log("mouse in rmLink and clicked on node", d);
+                const selected = latestEditedTree.current.nodes.find((o) => o.selected);
+                if (!selected) {
+                    console.log("setting new node: ", d.id);
+                    dispatch(setSelectedNode(d));
+                } else {
+                    console.log("removing connection from", selected.id, d.id);
+                    if (d.id != selected.id) dispatch(removeConnection([selected, d]));
+                }
             } else {
                 setSelectedFamMember(d.famMemId);
             }

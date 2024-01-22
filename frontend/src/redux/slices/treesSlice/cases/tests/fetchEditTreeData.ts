@@ -1,10 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { EditedTree } from "../../editedTreeSlice";
+import { EditedTreeNotExtended } from "../../editedTreeSlice";
 
 export const fetchEditerTreeData = createAsyncThunk(
     "trees/fetchEditedTree",
     async (treeId: number) =>
-        new Promise<Omit<EditedTree, "status">>((res, rej) => {
+        new Promise<EditedTreeNotExtended>((res, rej) => {
             console.log("thunk running");
             setTimeout(() => {
                 if (true) {
