@@ -9,7 +9,7 @@ namespace family_tree_API.Services
         public List<FamilyMember> GetUserFamilyMembers();
         public FamilyMember addFamilyMember(FamilyMemberDto dto);
         public Boolean DeleteMember(String personId);
-        public FamilyMember editFamilyMember(FamilyMember familyMember);
+        public FamilyMember editFamilyMember(FamilyMemberDto dto);
     }
     public class MemberService:IMemberService
     {
@@ -88,20 +88,27 @@ namespace family_tree_API.Services
             return UserFamilyMembers;
         }
 
-        FamilyMember IMemberService.editFamilyMember(FamilyMember familyMember)
+        FamilyMember IMemberService.editFamilyMember(FamilyMemberDto dto)
         {
+
+            
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            FamilyMember fm = _context.FamilyMembers.Where(f=> f.Id == familyMember.Id && f.UserId.ToString() == userId ).FirstOrDefault();
+            FamilyMember fm = _context.FamilyMembers.Where(f=> f.Id == dto.Id && f.UserId.ToString() == userId ).FirstOrDefault();
             if (fm == null) {
                 throw new Exception("This user has no such family member");  
             }
+            fm.Name = dto.Name;
+            fm.Surname = dto.Surname;
+            fm.Name = dto.Name;
+            fm.BirthDate = dto.BirthDate;
+            fm.DeathDate = dto.DeathDate;
+            fm.AdditionalData = dto.AdditionalData;
 
-
-            _context.FamilyMembers.Update(familyMember);
+            _context.FamilyMembers.Update(fm);
             _context.SaveChanges();
 
-            return familyMember;
+            return fm;
         } 
     }
 }

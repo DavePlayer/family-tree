@@ -43,9 +43,9 @@ namespace family_tree_API.Controllers
         }
 
         [HttpPost("editfamilymember")]
-        public IActionResult editFamilyMember([FromBody] FamilyMember fm)
+        public IActionResult editFamilyMember([FromBody] FamilyMemberDto dto)
         {
-            return Json(_memberService.editFamilyMember(fm));
+            return Json(_memberService.editFamilyMember(dto));
         }
     }
 }
