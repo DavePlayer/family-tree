@@ -24,7 +24,7 @@ namespace family_tree_API.Services
 
         Boolean DeleteTreeById(String treeId);
 
-        FamilyTree editTree(FamilyTree familyTree);
+        FamilyTree editTree(FamilyTreeDto dto);
 
         Array getWholeTree(String treeId);
     }
@@ -40,7 +40,7 @@ namespace family_tree_API.Services
         }
 
 
-        //nie dodaje id drzewa
+        
         FamilyTree ITreeService.AddFamilyTree(FamilyTreeDto dto)
         {
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -120,21 +120,24 @@ namespace family_tree_API.Services
             return false;
         }
 
-        FamilyTree ITreeService.editTree(FamilyTree familyTree)
+        FamilyTree ITreeService.editTree(FamilyTreeDto dto)
         {
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            FamilyTree? tree = _context.FamilyTrees.Where(m => m.Id == familyTree.Id && m.UserId.ToString() == userId).FirstOrDefault();
+            FamilyTree? tree = _context.FamilyTrees.Where(m => m.Id == dto.Id && m.UserId.ToString() == userId).FirstOrDefault();
 
             if (tree == null)
             {
                 throw new Exception("There is no such family tree");
             }
 
-            _context.FamilyTrees.Update(familyTree);
+            tree.Name = dto.Name;
+            tree.ImgUrl = dto.ImgUrl;
+
+            _context.FamilyTrees.Update(tree);
             _context.SaveChanges();
 
-            return familyTree;
+            return tree;
         }
 
         Array ITreeService.getWholeTree(String treeId)
