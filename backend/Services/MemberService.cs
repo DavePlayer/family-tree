@@ -51,16 +51,18 @@ namespace family_tree_API.Services
             if (connections.Count > 0)
             {
                 _context.Connections.RemoveRange(connections);
+                _context.SaveChanges();
             }
         }
 
         private void deleteNodeByUserId(String userId)
         {
-            Node node = _context.Nodes.Where(n => n.FamilyMember.ToString() == userId).FirstOrDefault();
+            Node? node = _context.Nodes.Where(n => n.FamilyMember.ToString() == userId).FirstOrDefault();
             if (node != null)
             {
                 deleteConnectionByNodeId(node.Id.ToString());
                 _context.Nodes.Remove(node);
+                _context.SaveChanges();
             }
         }
 
@@ -68,11 +70,12 @@ namespace family_tree_API.Services
         {
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            FamilyMember person = _context.FamilyMembers.Where(m => m.Id.ToString() == personId).FirstOrDefault();
-            if (person.UserId.ToString() == userId)
+            FamilyMember? person = _context.FamilyMembers.Where(m => m.Id.ToString() == personId).FirstOrDefault();
+            if (person !=null && person.UserId.ToString() == userId)
             {
                 deleteNodeByUserId(person.Id.ToString());
                 _context.FamilyMembers.Remove(person);
+                _context.SaveChanges();
                 return true;
             }
             return false;

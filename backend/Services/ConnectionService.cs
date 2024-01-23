@@ -30,7 +30,7 @@ namespace family_tree_API.Services
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             //sprawdza drzewo i nody do których odnosi się request
-            /*FamilyTree? famTree = _context.FamilyTrees.Where(t => (t.Id == dto.FamilyTreeId && t.UserId.ToString() == userId)).FirstOrDefault();
+            FamilyTree? famTree = _context.FamilyTrees.Where(t => (t.Id == dto.FamilyTreeId && t.UserId.ToString() == userId)).FirstOrDefault();
             Node? nodeToId = _context.Nodes.Where(n => n.Id == dto.To).FirstOrDefault();
             Node? nodeFromId = _context.Nodes.Where(n => n.Id == dto.From).FirstOrDefault();
 
@@ -49,7 +49,7 @@ namespace family_tree_API.Services
             if (to == null || from == null)
             {
                 throw new Exception("One or both family members does not belong to this user");
-            }*/
+            }
 
             Connection connection = new Connection()
             {
