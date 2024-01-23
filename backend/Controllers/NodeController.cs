@@ -24,7 +24,7 @@ namespace family_tree_API.Controllers
         }
 
         [HttpPost("editnode")]
-        public IActionResult editNode([FromBody] Models.Node node)
+        public IActionResult editNode([FromBody] NodeDto node)
         {
             return Ok(_nodeService.editNode(node));
         }

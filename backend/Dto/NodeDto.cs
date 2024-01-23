@@ -2,6 +2,7 @@
 {
     public class NodeDto
     {
+        public Guid? Id { get; set; }
         public double PosX { get; set; }
 
         public double PosY { get; set; }
