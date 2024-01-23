@@ -53,6 +53,7 @@ namespace family_tree_API.Services
 
             Connection connection = new Connection()
             {
+                Id = Guid.NewGuid(),
                 FamilyTreeId = dto.FamilyTreeId,
                 To = dto.To,
                 From = dto.From

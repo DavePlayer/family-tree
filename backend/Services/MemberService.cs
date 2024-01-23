@@ -28,6 +28,7 @@ namespace family_tree_API.Services
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var newMember = new FamilyMember()
             {
+                Id = Guid.NewGuid(),
                 UserId = Guid.Parse(userId),
                 ImgUrl = dto.ImgUrl,
                 Name = dto.Name,

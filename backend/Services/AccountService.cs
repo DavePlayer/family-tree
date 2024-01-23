@@ -37,6 +37,8 @@ namespace family_tree_API.Services
         {
             var newUser = new User()
             {
+
+                Id = Guid.NewGuid(),
                 EMail = dto.Email,
                 Name = dto.Name,
                 Password = dto.Password,

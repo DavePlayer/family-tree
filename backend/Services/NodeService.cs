@@ -39,6 +39,7 @@ namespace family_tree_API.Services
 
             Node node = new Node()
             {
+                Id = Guid.NewGuid(),
                 PosX = dto.PosX,
                 PosY = dto.PosY
             };
