@@ -37,5 +37,15 @@ namespace family_tree_API.Controllers
             }
             return BadRequest();
         }
+
+        [HttpPost("validatejwt")]
+        public IActionResult validateJWT([FromBody]string jwt)
+        {
+            if (_accountService.validateJWT(jwt))
+            {
+                return Ok();
+            }
+            return BadRequest();
+        }
     }
 }

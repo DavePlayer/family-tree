@@ -16,6 +16,7 @@ namespace family_tree_API.Services
         string GenerateJwt(LoginDto dto);
 
         Boolean DeleteUser();
+        bool validateJWT(string jwt);
     }
 
     public class AccountService : IAccountService
@@ -87,7 +88,34 @@ namespace family_tree_API.Services
 
 
 
+        bool IAccountService.validateJWT(string jwt)
+        {
+            
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var validationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
 
+                    ValidateIssuer = false, // W zależności od potrzeb można dostosować
+                    ValidateAudience = false, // W zależności od potrzeb można dostosować
+                    ValidIssuer = "issuer",
+                    ValidAudience = "audience",
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("randomowy string do generowania jwt")),
+                };
+
+                try
+                {
+                    SecurityToken validatedToken;
+                    var principal = tokenHandler.ValidateToken(jwt, validationParameters, out validatedToken);
+                    return true; // Token jest ważny
+                }
+                catch (Exception ex)
+                {
+                    // Token jest nieważny, obsłuż błąd
+                    Console.WriteLine($"Błąd weryfikacji tokena JWT: {ex.Message}");
+                    return false;
+                }
+        }
 
 
 
