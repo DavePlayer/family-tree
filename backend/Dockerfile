@@ -14,10 +14,6 @@ WORKDIR /app
 COPY --from=build /publish ./
 RUN mkdir /app/assets
 
-ENV ASPNETCORE_ENVIRONMENT=Development
-ENV ASPNETCORE_HTTP_PORT=https//+:5001
-ENV ASPNETCORE_URLS=http://+:5000
-
 ENTRYPOINT ["dotnet", "family_tree_API.dll" ]
 
 # docker build --rm -t family_tree:1 .
