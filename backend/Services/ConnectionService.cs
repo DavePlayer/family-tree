@@ -1,4 +1,5 @@
 ﻿using family_tree_API.Dto;
+using family_tree_API.Exceptions;
 using family_tree_API.Models;
 using System.Security.Claims;
 namespace family_tree_API.Services
@@ -7,7 +8,7 @@ namespace family_tree_API.Services
     public interface IConnectionService {
 
         public Connection AddConnection(ConnectionDto dto);
-        public Connection editConnection(Connection con);
+        public Connection editConnection(ConnectionDto dto);
 
     }
 
@@ -36,11 +37,11 @@ namespace family_tree_API.Services
 
             if (famTree == null)
             {
-                throw new Exception("Tee does not exist or it does not belong to this user");
+                throw new BadRequestException("Tee does not exist or it does not belong to this user", new Exception());
             }
             if (nodeToId == null || nodeFromId == null)
             {
-                throw new Exception("One or both family members does not exist");
+                throw new BadRequestException("One or both family members does not exist", new Exception());
             }
             // sprawdza członków rodziny 
             FamilyMember? to = _context.FamilyMembers.Where(m => (m.Id == nodeToId.FamilyMember && m.UserId.ToString() == userId)).FirstOrDefault();
@@ -48,7 +49,7 @@ namespace family_tree_API.Services
 
             if (to == null || from == null)
             {
-                throw new Exception("One or both family members does not belong to this user");
+                throw new BadRequestException("One or both family members does not belong to this user", new Exception());
             }
 
             Connection connection = new Connection()
@@ -65,13 +66,13 @@ namespace family_tree_API.Services
             return connection;
         }
 
-        Connection IConnectionService.editConnection(Connection con)
+        Connection IConnectionService.editConnection(ConnectionDto dto)
         {
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            FamilyTree? famTree = _context.FamilyTrees.Where(t => (t.Id == con.FamilyTreeId && t.UserId.ToString() == userId)).FirstOrDefault();
-            Node? nodeToId = _context.Nodes.Where(n => n.Id == con.To).FirstOrDefault();
-            Node? nodeFromId = _context.Nodes.Where(n => n.Id == con.From).FirstOrDefault();
+            FamilyTree? famTree = _context.FamilyTrees.Where(t => (t.Id == dto.FamilyTreeId && t.UserId.ToString() == userId)).FirstOrDefault();
+            Node? nodeToId = _context.Nodes.Where(n => n.Id == dto.To).FirstOrDefault();
+            Node? nodeFromId = _context.Nodes.Where(n => n.Id == dto.From).FirstOrDefault();
 
             if (famTree == null)
             {
@@ -89,9 +90,20 @@ namespace family_tree_API.Services
             {
                 throw new Exception("One or both family members does not belong to this user");
             }
-            _context.Connections.Update(con);
+
+            Connection connection = _context.Connections.Where(e => e.Id == dto.Id).FirstOrDefault();
+            if (connection == null)
+            {
+                throw new Exception("No such connection");
+            }
+
+            connection.From = dto.From;
+            connection.To = dto.To; 
+
+
+            _context.Connections.Update(connection);
             _context.SaveChanges();
-            return con;
+            return connection;
         }
     }
 }

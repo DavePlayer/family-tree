@@ -26,10 +26,10 @@ namespace family_tree_API.Controllers
         }
 
         [HttpPost("editconnection")]
-        public IActionResult editConnection([FromBody] Models.Connection con)
+        public IActionResult editConnection([FromBody] ConnectionDto dto)
         {
             
-            return Json(_connectionService.editConnection(con));
+            return Json(_connectionService.editConnection(dto));
         }
     }
 }
