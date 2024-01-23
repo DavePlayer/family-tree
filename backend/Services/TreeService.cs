@@ -142,7 +142,7 @@ namespace family_tree_API.Services
 
         Array ITreeService.getWholeTree(String treeId)
         {
-            Object[] tab = new Object[3];
+            Object[] tab = new Object[4];
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             FamilyTree? FamTree = _context.FamilyTrees.Where(t=> (t.Id.ToString() == treeId && t.UserId.ToString() == userId)).FirstOrDefault();
@@ -158,9 +158,10 @@ namespace family_tree_API.Services
                     {
                         members.Add(_context.FamilyMembers.Where(f=>f.Id ==  node.FamilyMember).FirstOrDefault());
                     }
-                    tab[0] = members;
-                    tab[1] = nodes;
-                    tab[2] = connections;
+                    tab[0] = FamTree;
+                    tab[1] = members;
+                    tab[2] = nodes;
+                    tab[4] = connections;
                 }
             }
             return tab;
