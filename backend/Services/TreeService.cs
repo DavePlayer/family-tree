@@ -161,7 +161,7 @@ namespace family_tree_API.Services
                     tab[0] = FamTree;
                     tab[1] = members;
                     tab[2] = nodes;
-                    tab[4] = connections;
+                    tab[3] = connections;
                 }
             }
             return tab;
