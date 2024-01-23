@@ -48,6 +48,13 @@ namespace family_tree_API.Controllers
             return Json(_treeService.editTree(tree));
 
         }
+        [HttpGet("getwholetree")]
+        public IActionResult getWholeTree([FromBody] String id)
+        {
+
+            return Json(_treeService.getWholeTree(id));
+
+        }
         [AllowAnonymous]
         [HttpGet("test")]
         public string Test()

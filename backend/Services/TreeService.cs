@@ -25,6 +25,8 @@ namespace family_tree_API.Services
         Boolean DeleteTreeById(String treeId);
 
         FamilyTree editTree(FamilyTree familyTree);
+
+        Array getWholeTree(String treeId);
     }
     public class TreeService : ITreeService
     {
@@ -108,7 +110,7 @@ namespace family_tree_API.Services
         {
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             FamilyTree tree = _context.FamilyTrees.Where(m => m.Id.ToString() == treeId).FirstOrDefault();
-            if (tree.UserId.ToString() == userId)
+            if (tree.UserId.ToString().Equals(userId))
             {
                 deleteNodesByTreeId(treeId);
                 _context.FamilyTrees.Remove(tree);
@@ -135,6 +137,30 @@ namespace family_tree_API.Services
             return familyTree;
         }
 
+        Array ITreeService.getWholeTree(String treeId)
+        {
+            Object[] tab = new Object[3];
+            string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            FamilyTree? FamTree = _context.FamilyTrees.Where(t=> (t.Id.ToString() == treeId && t.UserId.ToString() == userId)).FirstOrDefault();
+
+            if(FamTree != null)
+            {
+                List <Node> nodes = _context.Nodes.Where(n=> n.FamilyTree.ToString() == treeId).ToList();
+                List <Connection> connections = _context.Connections.Where(c => c.FamilyTreeId.ToString() == treeId).ToList();
+                if (nodes.Count > 0)
+                {
+                    List <FamilyMember> members = new List<FamilyMember>();
+                    foreach (Node node in nodes)
+                    {
+                        members.Add(_context.FamilyMembers.Where(f=>f.Id ==  node.FamilyMember).FirstOrDefault());
+                    }
+                    tab[0] = members;
+                    tab[1] = nodes;
+                    tab[2] = connections;
+                }
+            }
+            return tab;
+        }
     }
 }
