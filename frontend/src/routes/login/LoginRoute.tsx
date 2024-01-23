@@ -4,12 +4,16 @@ import { GradientText } from "./components/GradientText.tsx";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import { AppDispatch } from "./../../redux/store.ts";
+import { loginUser } from "../../redux/slices/userSlices/cases/login.ts";
+import { useDispatch } from "react-redux";
 
 export const LoginRoute = () => {
     const [loginData, setLoginData] = useState({ email: "", password: "" });
     const [emailError, setEmailError] = useState("");
     const [passError, setPasssError] = useState("");
     const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>();
 
     const handleForm = (e: React.ChangeEvent<HTMLInputElement>) => {
         setLoginData((prev) => {
@@ -45,7 +49,13 @@ export const LoginRoute = () => {
         e.preventDefault();
         if (handlePassword() && handleEmailSyntax()) {
             console.log(loginData);
-            return navigate("/trees");
+            // return navigate("/trees");
+            return dispatch(
+                loginUser({
+                    email: loginData.email,
+                    password: loginData.password,
+                })
+            );
         }
         toast.error("invalid login data");
     };

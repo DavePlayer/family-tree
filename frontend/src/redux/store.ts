@@ -3,9 +3,10 @@ import logger from "redux-logger";
 import treesSlice from "./slices/treesSlice/treeSlice.ts";
 import editedTreeSlice from "./slices/treesSlice/editedTreeSlice.ts";
 import { useDispatch } from "react-redux";
+import userSlice from "./slices/userSlices/userSlice.ts";
 
 export const store = configureStore({
-    reducer: { trees: treesSlice, editedTree: editedTreeSlice },
+    reducer: { trees: treesSlice, editedTree: editedTreeSlice, user: userSlice },
     // middleware used to display state static/async state changes
     middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
 });
