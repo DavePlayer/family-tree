@@ -32,7 +32,7 @@ namespace family_tree_API.Controllers
             return Json(_connectionService.editConnection(dto));
         }
 
-        [HttpPost ("deleteconnection")]
+        [HttpDelete ("deleteconnection")]
         public IActionResult deleteConnection(string id)
         {
             if (_connectionService.deleteConnection(id)) {
