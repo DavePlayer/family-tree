@@ -42,10 +42,10 @@ namespace family_tree_API.Controllers
         }
 
         [HttpPost("edittree")]
-        public IActionResult editTree([FromBody] Models.FamilyTree tree)
+        public IActionResult editTree([FromBody] FamilyTreeDto dto)
         {
 
-            return Json(_treeService.editTree(tree));
+            return Json(_treeService.editTree(dto));
 
         }
         [HttpGet("getwholetree")]
