@@ -2,6 +2,7 @@
 {
     public class ConnectionDto
     {
+        public Guid? Id { get; set; }
         public Guid FamilyTreeId { get; set; }
 
         public Guid From { get; set; }
