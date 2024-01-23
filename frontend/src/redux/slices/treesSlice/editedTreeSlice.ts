@@ -27,8 +27,8 @@ export interface FamilyMember {
 }
 
 export interface FamilyMemberToUpdate {
-    famMember: FamilyMember,
-    image?: File
+    famMember: FamilyMember;
+    image?: File;
 }
 
 export interface FamilyMember {
@@ -248,18 +248,18 @@ export const treesSlice = createSlice({
         // ---------------------
         // Create new Node
         // ---------------------
-        builder.addCase(createNewNode.pending, (state) => {
+        builder.addCase(createNewNode.pending, (state, action) => {
             state.toastId = toast.loading("craeting new node", {
                 autoClose: 5000,
                 closeButton: true,
                 closeOnClick: true,
-                toastId: "createNode",
+                toastId: `createNode${action.meta.requestId}`,
             });
             state.status = status.loading;
         });
         builder.addCase(createNewNode.fulfilled, (state, action) => {
             if (state.toastId)
-                toast.update(state.toastId, {
+                toast.update(`createNode${action.meta.requestId}`, {
                     render: "created new node successfully",
                     type: "success",
                     isLoading: false,
@@ -307,7 +307,7 @@ export const treesSlice = createSlice({
         });
         builder.addCase(removeNode.rejected, (state, payload) => {
             if (state && state.toastId)
-                toast.update(state.toastId, {
+                toast.update(`removeNode${payload.meta.requestId}`, {
                     render: "failed to remove node",
                     type: "error",
                     isLoading: false,
