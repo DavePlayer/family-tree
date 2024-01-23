@@ -94,11 +94,9 @@ export const TreeEdit = () => {
             const target = nodesData.find((node) => node.id === d.to);
 
             if (source && target) {
-                return `M${source.posX + (source.famMemId ? imageSize / 2 : nodeSize / 2)},${
-                    source.posY + (source.famMemId ? imageSize / 2 : nodeSize / 2)
-                } L${target.posX + (target.famMemId ? imageSize / 2 : nodeSize / 2)},${
-                    target.posY + (target.famMemId ? imageSize / 2 : nodeSize / 2)
-                }`;
+                return `M${source.posX + (source.famMemId ? imageSize / 2 : nodeSize / 2)},${source.posY + (source.famMemId ? imageSize / 2 : nodeSize / 2)
+                    } L${target.posX + (target.famMemId ? imageSize / 2 : nodeSize / 2)},${target.posY + (target.famMemId ? imageSize / 2 : nodeSize / 2)
+                    }`;
             } else {
                 // Handle cases where source or target is not found
                 return "";
@@ -158,7 +156,7 @@ export const TreeEdit = () => {
             .attr("ry", (d) => (d.famMemId ? 0 : imageSize + 50))
             .style("stroke-width", (d) => (d.famMemId ? 1 : 0.6))
             .style(`fill`, (d) => (d.famMemId ? `#292929` : "#fff"))
-            .attr("fill-opacity", (d) => (d.famMemId ? "0" : "1"));
+            .attr("opacity", (d) => (d.famMemId != null ? "0" : "1"));
 
         // inserting images into family member nodes
         nodeEnter
@@ -276,7 +274,7 @@ export const TreeEdit = () => {
                     .attr("height", `${imageSize + textHeight + labelSize}`)
                     .attr("width", `${imageSize - offset * 2}`)
                     .attr("transform", "translate(" + -Math.abs(offset) + "," + 0 + ")")
-                    .attr("fill-opacity", "1");
+                    .attr("opacity", "1");
             }
         }
         function nodeMouseLeave(this: any, _: any, d: Node) {
@@ -290,7 +288,8 @@ export const TreeEdit = () => {
                     .select("rect")
                     .attr("width", `${imageSize}`)
                     .attr("height", `${imageSize}`)
-                    .attr("transform", "translate(" + 0 + "," + 0 + ")");
+                    .attr("transform", "translate(" + 0 + "," + 0 + ")")
+                    .attr("opacity", "0");
             }
         }
 
@@ -319,6 +318,7 @@ export const TreeEdit = () => {
                         console.log("found connection to be removed: ", connection);
                     }
                     console.log("removing connection from", selected.id, d.id);
+                    dispatch(setMouseMode(MouseMode.None))
                     dispatch(removeConnection([selected, d]));
                     dispatch(resetSelection());
                 }
@@ -344,6 +344,7 @@ export const TreeEdit = () => {
                         console.log("found connection to be removed: ", connection);
                     }
                     console.log("removing connection from", selected.id, d.id);
+                    dispatch(setMouseMode(MouseMode.None))
                     dispatch(createConnection([selected, d]));
                     dispatch(resetSelection());
                 }
@@ -455,11 +456,9 @@ export const TreeEdit = () => {
                     const target = nodesData.find((node) => node.id === d.to);
 
                     if (source && target) {
-                        return `M${
-                            source.posX + (source.famMemId ? imageSize / 2 : nodeSize / 2)
-                        },${source.posY + (source.famMemId ? imageSize / 2 : nodeSize / 2)} L${
-                            target.posX + (target.famMemId ? imageSize / 2 : nodeSize / 2)
-                        },${target.posY + (target.famMemId ? imageSize / 2 : nodeSize / 2)}`;
+                        return `M${source.posX + (source.famMemId ? imageSize / 2 : nodeSize / 2)
+                            },${source.posY + (source.famMemId ? imageSize / 2 : nodeSize / 2)} L${target.posX + (target.famMemId ? imageSize / 2 : nodeSize / 2)
+                            },${target.posY + (target.famMemId ? imageSize / 2 : nodeSize / 2)}`;
                     } else {
                         // Handle cases where source or target is not found
                         return "";
@@ -476,6 +475,22 @@ export const TreeEdit = () => {
                     if (member) return member.name;
                     if (d.famMemId) return "name not found";
                     return null;
+                });
+            svg.selectAll(".nodes")
+                .select("image")
+                // @ts-ignore
+                .attr("xlink:href", (d: any) => {
+                    if (d.famMemId) {
+                        const [familyMember] = latestEditedTree.current.members.filter(
+                            (member) => member.id === d.famMemId
+                        );
+                        return familyMember
+                            ? familyMember.img_url
+                                ? familyMember.img_url
+                                : userImg
+                            : "#";
+                    }
+                    return "#";
                 });
         };
         simulation.on("tick", updateNodes);

@@ -26,6 +26,21 @@ export interface FamilyMember {
     img_url?: string;
 }
 
+export interface FamilyMemberToUpdate {
+    famMember: FamilyMember,
+    image?: File
+}
+
+export interface FamilyMember {
+    id: number;
+    name: string;
+    status: string;
+    deathTime: Date | null;
+    address: string;
+    additionalData?: string;
+    img_url?: string;
+}
+
 export interface NodeConnection {
     id: number;
     famTreeNumber: number;

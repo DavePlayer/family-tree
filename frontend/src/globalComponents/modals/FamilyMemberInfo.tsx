@@ -4,6 +4,7 @@ import DatePicker from "react-datepicker";
 import CloseIcon from "./../../assets/close.svg?react";
 import EditIcon from "./../../assets/edit.svg?react";
 import SaveIcon from "./../../assets/save.svg?react";
+import DownloadIcon from "./../../assets/download.svg?react";
 import "react-datepicker/dist/react-datepicker.css";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../redux/store.ts";
@@ -13,6 +14,13 @@ export const FamilyMemberInfo = ({ famMember, close }: { famMember: FamilyMember
     const [member, setMember] = useState<FamilyMember>();
     const [isEditMode, setIsEditMode] = useState(false);
     const dispatch = useDispatch<AppDispatch>();
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+    const handleFile = (file: File) => {
+        if (file.type == "image/png" || file.type == "image/jpeg" || file.type == "image/jpg") {
+            setSelectedFile(file);
+        }
+    };
 
     useEffect(() => {
         setMember(famMember);
@@ -25,7 +33,21 @@ export const FamilyMemberInfo = ({ famMember, close }: { famMember: FamilyMember
             if (member?.status == "dead" && !member?.deathTime) {
                 member.status = "alive";
             }
-            dispatch(updateFamilyMemberData(member as FamilyMember));
+            if (member) {
+                dispatch(updateFamilyMemberData({
+                    famMember: member,
+                    image: selectedFile || undefined
+                })).then(() => {
+                    setMember((prev) => {
+                        if (prev) {
+                            return {
+                                ...prev,
+                                img_url: selectedFile ? URL.createObjectURL(selectedFile) : prev.img_url
+                            }
+                        }
+                    })
+                })
+            }
             return !prev;
         });
     };
@@ -46,7 +68,7 @@ export const FamilyMemberInfo = ({ famMember, close }: { famMember: FamilyMember
     };
 
     return (
-        <div className="max-h-[50vh]">
+        <div className="2xl:max-h-[50vh] xl:max-h-[70vh]">
             {!isEditMode ? (
                 <>
                     <CloseIcon
@@ -73,9 +95,52 @@ export const FamilyMemberInfo = ({ famMember, close }: { famMember: FamilyMember
             <h1 className="text-4xl text-center mb-5 font-extralight">Family Member info</h1>
             {member && (
                 <article className="p-3 px-9 flex gap-8 h-full items-center">
-                    <figure className="rounded-full overflow-hidden w-1/4 h-min">
-                        <img src={member.img_url} alt="user image" className="block w-full" />
-                    </figure>
+                    {isEditMode ? (
+                        <>
+                            <label
+                                htmlFor="upload"
+                                className="flex flex-col items-center gap-2 cursor-pointer"
+                            >
+                                <figure className="w-[250px] overflow-hidden flex flex-col items-center pb-3">
+                                    {selectedFile ? (
+                                        <>
+                                            <img
+                                                src={URL.createObjectURL(selectedFile)}
+                                                alt="image"
+                                                className="max-w-full max-h-1/2 block max-h-[300px]"
+                                            />
+                                            <p className="text-center mt-2 text-sm text-gray-500 dark:text-gray-400">
+                                                <span className="font-semibold">
+                                                    Click or drag/drop to upload again
+                                                </span>
+                                            </p>
+                                        </>
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                            <DownloadIcon className="w-12 h-12 mb-4" />
+                                            <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                                                <span className="font-semibold">Click to upload</span> or
+                                                drag and drop
+                                            </p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                                                PNG, JPG (PREFERABLY. 800x400px)
+                                            </p>
+                                        </div>
+                                    )}
+                                </figure>
+                            </label>
+                            <input
+                                id="upload"
+                                type="file"
+                                className="hidden"
+                                onChange={(e) => handleFile(e.target.files![0])}
+                            />
+                        </>
+                    ) : (
+                        <figure className="rounded-full overflow-hidden w-1/4 aspect-square flex items-center">
+                            <img src={member.img_url} alt="user image" className="h-full w-full text-center flex justify-center items-center" />
+                        </figure>
+                    )}
                     <section className="w-3/4 bg-dark-1 rounded-3xl p-3 min-h-[20rem] h-full overflow-y-scroll">
                         <div className="w-full">
                             <label className="text-gray-400" htmlFor="name">
@@ -216,7 +281,8 @@ export const FamilyMemberInfo = ({ famMember, close }: { famMember: FamilyMember
                         </div>
                     </section>
                 </article>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 };
