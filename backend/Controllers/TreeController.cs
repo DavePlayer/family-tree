@@ -49,7 +49,7 @@ namespace family_tree_API.Controllers
 
         }
         [HttpGet("getwholetree")]
-        public IActionResult getWholeTree([FromBody] String id)
+        public IActionResult getWholeTree([FromHeader] String id)
         {
 
             return Json(_treeService.getWholeTree(id));
