@@ -1,5 +1,6 @@
 ﻿using family_tree_API.Dto;
 using family_tree_API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace family_tree_API.Controllers
@@ -39,13 +40,13 @@ namespace family_tree_API.Controllers
         }
 
         [HttpPost("validatejwt")]
-        public IActionResult validateJWT([FromBody]string jwt)
+        public IActionResult validateJWT(string jwt)
         {
             if (_accountService.validateJWT(jwt))
             {
-                return Ok();
+                return Ok("Token is ok");
             }
-            return BadRequest();
+            return BadRequest("Token is not valid");
         }
     }
 }

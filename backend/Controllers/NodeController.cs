@@ -28,5 +28,15 @@ namespace family_tree_API.Controllers
         {
             return Ok(_nodeService.editNode(node));
         }
+
+        [HttpDelete("deletenode")]
+        public IActionResult deleteNode(string id)
+        {
+            if (_nodeService.deleteNode(id)) {
+                return Ok(id);
+            }
+            return BadRequest();
+            
+        }
     }
 }
