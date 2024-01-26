@@ -2,13 +2,13 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 
 export const uploadImage = createAsyncThunk(
     "uploadImage",
-    async ({ file, treeId, token }: { file: File; treeId: string; token: string }) => {
+    async ({ file, token }: { file: File; token: string }) => {
         const formData = new FormData();
-        formData.append("image", file);
-        return fetch(`${import.meta.env.VITE_API_URL}/file/uploadimage?id=${treeId}`, {
+        formData.append("file", file);
+        return fetch(`${import.meta.env.VITE_API_URL}/file/uploadimage`, {
             method: "POST",
             headers: {
-                "Content-type": "application/json;charset=utf-8",
+                // "Content-type": "multipart/form-data; boundary=<calculated when request is sent>",
                 Authorization: `Bearer ${token}`,
             },
             body: formData,

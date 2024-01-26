@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { fetchTrees } from "../../redux/slices/treesSlice/cases/fetchTrees.ts";
 import Popup from "reactjs-popup";
 import { CreateNewTree } from "../../globalComponents/modals/CreateNewTree.tsx";
-import { Link } from "react-router-dom";
+import { TreeView } from "./TreeView.tsx";
 
 export const TreesViewRoute = () => {
     const { familyTrees: trees } = useSelector((root: RootState) => root.trees);
@@ -46,23 +46,7 @@ export const TreesViewRoute = () => {
             <section className="flex flex-wrap gap-8 px-8 pt-16">
                 {trees.length > 0 ? (
                     trees.map((tree) => {
-                        return (
-                            <Link to={`/trees/${tree.id}`} className="w-1/5">
-                                <article
-                                    key={tree.id}
-                                    className="w-full rounded-3xl overflow-hidden cursor-pointer"
-                                >
-                                    <figure className="h-[10rem] overflow-hidden rounded-3xl flex justify-center">
-                                        <img
-                                            src={tree.imgUrl}
-                                            alt="background"
-                                            className="w-full max-w-none block no-tap"
-                                        />
-                                    </figure>
-                                    <p className="w-full text-center no-tap">{tree.name}</p>
-                                </article>
-                            </Link>
-                        );
+                        return <TreeView tree={tree} />;
                     })
                 ) : (
                     <h3 className="title text-center mt-16">there are no trees right now :(</h3>

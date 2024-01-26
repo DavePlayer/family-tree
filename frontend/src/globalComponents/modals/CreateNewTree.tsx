@@ -27,18 +27,27 @@ export const CreateNewTree: React.FC<{ close: () => void }> = ({ close }) => {
                 uploadImage({
                     file: selectedFile,
                     token: userData.jwt,
-                    treeId: "dsa",
                 })
-            );
-            // return dispatch(
-            //     createNewTree({n})
-            // )
-            //     .then((a) => {
-            //         console.log(a);
-            //         return a;
-            //     })
-            //     .then((a) => a.meta.requestStatus != "rejected" && close())
-            //     .catch(() => {});
+            ).then((a) => {
+                console.log("SUPPOSED IMAGE URL", a);
+                return dispatch(
+                    createNewTree({
+                        token: userData.jwt,
+                        tree: {
+                            name: name,
+                            imgUrl: `${import.meta.env.VITE_API_URL}/assets/${(
+                                a.payload as string
+                            ).replace(/\"/g, "")}`,
+                        },
+                    })
+                )
+                    .then((a) => {
+                        console.log(a);
+                        return a;
+                    })
+                    .then((a) => a.meta.requestStatus != "rejected" && close())
+                    .catch(() => {});
+            });
         }
         return toast.error("not enough data provided");
     };

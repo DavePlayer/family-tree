@@ -96,10 +96,7 @@ export const treesSlice = createSlice({
                     isLoading: false,
                     autoClose: 2000,
                 });
-            return {
-                ...state,
-                familyTrees: [...state.familyTrees, action.payload],
-            };
+            state.familyTrees = [...state.familyTrees, action.payload];
         });
         builder.addCase(createNewTree.rejected, (state, payload) => {
             if (state.toastId)
@@ -116,34 +113,19 @@ export const treesSlice = createSlice({
         // Upload image to tree
         // ---------------------
         builder.addCase(uploadImage.pending, (state) => {
-            console.log("pending trees from thunk");
-            state.toastId = toast.loading("fetching family trees", {
-                autoClose: 5000,
-                closeButton: true,
-                closeOnClick: true,
-                toastId: "yoMama",
-            });
             state.status = status.loading;
         });
         builder.addCase(uploadImage.fulfilled, (state, action) => {
             state.status = status.loaded;
-            if (state.toastId)
-                toast.update(state.toastId, {
-                    render: "createdNewTree",
-                    type: "success",
-                    isLoading: false,
-                    autoClose: 2000,
-                });
-            state.tempImageAddr = `${import.meta.env.VITE_API_URL}/assets/${action.payload}.png`;
+            state.tempImageAddr = `${import.meta.env.VITE_API_URL}/assets/${action.payload}`;
         });
         builder.addCase(uploadImage.rejected, (state, payload) => {
-            if (state.toastId)
-                toast.update(state.toastId, {
-                    render: "failed to craete new tree",
-                    type: "error",
-                    isLoading: false,
-                    autoClose: 2000,
-                });
+            toast.update(`imageUpload`, {
+                render: "failed to upload image",
+                type: "error",
+                isLoading: false,
+                autoClose: 2000,
+            });
             console.error(`${payload.error.code}: ${payload.error.message}`);
         });
     },

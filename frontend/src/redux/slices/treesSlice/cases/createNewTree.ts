@@ -3,12 +3,13 @@ import { Tree } from "../treeSlice";
 
 export const createNewTree = createAsyncThunk(
     "trees/createNewTree",
-    async (tree: Omit<Tree, "id">) =>
-        fetch(`${import.meta.env.VITE_API_URL}/api/account/login`, {
+    async ({ tree, token }: { tree: Omit<Tree, "id">; token: string }) =>
+        fetch(`${import.meta.env.VITE_API_URL}/trees/addtree`, {
             method: "POST",
             body: JSON.stringify(tree),
             headers: {
                 "Content-type": "application/json;charset=utf-8",
+                Authorization: `Bearer ${token}`,
             },
         }).then((data) => {
             if (!data.ok) {
