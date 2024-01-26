@@ -126,7 +126,7 @@ namespace family_tree_API.Services
                 }
             }
 
-            return (userId + "/" + toSaveId);
+            return (userId + "/" + toSaveId+fileExtension);
         }
 
         private async Task<int> addImageUrlToMembers(string memberId, string imgUrl) {
