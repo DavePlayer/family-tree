@@ -1,9 +1,12 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 function App() {
-    return (
-        <>
-            <h1 className="text-red-500 text-center">test</h1>
-        </>
-    );
+    const navigate = useNavigate();
+    useEffect(() => {
+        navigate("/login");
+    });
+    return <div className="w-screen h-screen bg-mainBg"></div>;
 }
 
 export default App;

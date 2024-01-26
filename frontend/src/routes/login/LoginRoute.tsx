@@ -55,7 +55,7 @@ export const LoginRoute = () => {
                     email: loginData.email,
                     password: loginData.password,
                 })
-            );
+            ).then(() => navigate("/trees"));
         }
         toast.error("invalid login data");
     };
