@@ -2,14 +2,16 @@ import React, { useState } from "react";
 import DownloadIcon from "./../../assets/download.svg?react";
 import CloseIcon from "./../../assets/close.svg?react";
 import { toast } from "react-toastify";
-import { useDispatch } from "react-redux";
-import { createNewTree } from "../../redux/slices/treesSlice/cases/tests/createNewTree";
-import { AppDispatch } from "../../redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { createNewTree } from "../../redux/slices/treesSlice/cases/createNewTree";
+import { AppDispatch, RootState } from "../../redux/store";
+import { uploadImage } from "../functions/uploadImageCase.ts";
 
 export const CreateNewTree: React.FC<{ close: () => void }> = ({ close }) => {
     const dispatch = useDispatch<AppDispatch>();
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [name, setName] = useState("");
+    const userData = useSelector((root: RootState) => root.user);
     const handleFile = (file: File) => {
         if (file.type == "image/png" || file.type == "image/jpeg" || file.type == "image/jpg") {
             setSelectedFile(file);
@@ -21,12 +23,25 @@ export const CreateNewTree: React.FC<{ close: () => void }> = ({ close }) => {
 
     const handleCrateTree = () => {
         if (selectedFile && name.length > 0) {
-            return dispatch(createNewTree({ name: name, imgUrl: URL.createObjectURL(selectedFile) }))
-                .then((a) => a.meta.requestStatus != 'rejected' && close())
-                .catch(() => { })
+            return dispatch(
+                uploadImage({
+                    file: selectedFile,
+                    token: userData.jwt,
+                    treeId: "dsa",
+                })
+            );
+            // return dispatch(
+            //     createNewTree({n})
+            // )
+            //     .then((a) => {
+            //         console.log(a);
+            //         return a;
+            //     })
+            //     .then((a) => a.meta.requestStatus != "rejected" && close())
+            //     .catch(() => {});
         }
-        return toast.error("not enough data provided")
-    }
+        return toast.error("not enough data provided");
+    };
 
     return (
         <div className="modal relative">
@@ -82,7 +97,9 @@ export const CreateNewTree: React.FC<{ close: () => void }> = ({ close }) => {
                     placeholder="tree name"
                     className="mt-5 text-center w-1/2"
                 />
-                <button onClick={() => handleCrateTree()} className="gradient-button w-1/2">Create Tree</button>
+                <button onClick={() => handleCrateTree()} className="gradient-button w-1/2">
+                    Create Tree
+                </button>
             </div>
         </div>
     );

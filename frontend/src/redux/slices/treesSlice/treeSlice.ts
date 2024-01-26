@@ -1,11 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { Id, toast } from "react-toastify";
-import { fetchTrees } from "./cases/tests/fetchTrees.ts";
+import { fetchTrees } from "./cases/fetchTrees.ts";
 import { createNewTree } from "./cases/tests/createNewTree.ts";
+import { uploadImage } from "../../../globalComponents/functions/uploadImageCase.ts";
 
 // Define a type for the slice state
 export interface Tree {
-    id: number;
+    id: string;
     name: string;
     imgUrl: string;
 }
@@ -20,12 +21,14 @@ type TreeSlice = {
     status: status;
     familyTrees: Array<Tree>;
     toastId?: Id;
+    tempImageAddr: string;
 };
 
 // Define the initial state using that type
 const initialState: TreeSlice = {
     status: status.pending,
     familyTrees: [],
+    tempImageAddr: "",
 };
 
 export const treesSlice = createSlice({
@@ -41,7 +44,6 @@ export const treesSlice = createSlice({
         // Fetch Trees
         // ---------------------
         builder.addCase(fetchTrees.pending, (state) => {
-            console.log("pending trees from thunk");
             state.toastId = toast.loading("fetching family trees", {
                 autoClose: 5000,
                 closeButton: true,
@@ -72,8 +74,6 @@ export const treesSlice = createSlice({
             console.error(`${payload.error.code}: ${payload.error.message}`);
         });
 
-
-
         // ---------------------
         // Create new Tree
         // ---------------------
@@ -96,9 +96,47 @@ export const treesSlice = createSlice({
                     isLoading: false,
                     autoClose: 2000,
                 });
-            state.familyTrees = [...state.familyTrees, action.payload];
+            return {
+                ...state,
+                familyTrees: [...state.familyTrees, action.payload],
+            };
         });
         builder.addCase(createNewTree.rejected, (state, payload) => {
+            if (state.toastId)
+                toast.update(state.toastId, {
+                    render: "failed to craete new tree",
+                    type: "error",
+                    isLoading: false,
+                    autoClose: 2000,
+                });
+            console.error(`${payload.error.code}: ${payload.error.message}`);
+        });
+
+        // ---------------------
+        // Upload image to tree
+        // ---------------------
+        builder.addCase(uploadImage.pending, (state) => {
+            console.log("pending trees from thunk");
+            state.toastId = toast.loading("fetching family trees", {
+                autoClose: 5000,
+                closeButton: true,
+                closeOnClick: true,
+                toastId: "yoMama",
+            });
+            state.status = status.loading;
+        });
+        builder.addCase(uploadImage.fulfilled, (state, action) => {
+            state.status = status.loaded;
+            if (state.toastId)
+                toast.update(state.toastId, {
+                    render: "createdNewTree",
+                    type: "success",
+                    isLoading: false,
+                    autoClose: 2000,
+                });
+            state.tempImageAddr = `${import.meta.env.VITE_API_URL}/assets/${action.payload}.png`;
+        });
+        builder.addCase(uploadImage.rejected, (state, payload) => {
             if (state.toastId)
                 toast.update(state.toastId, {
                     render: "failed to craete new tree",

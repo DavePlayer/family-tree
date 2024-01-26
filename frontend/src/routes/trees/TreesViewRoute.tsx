@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store.ts";
 import { useEffect, useState } from "react";
-import { fetchTrees } from "../../redux/slices/treesSlice/cases/tests/fetchTrees.ts";
+import { fetchTrees } from "../../redux/slices/treesSlice/cases/fetchTrees.ts";
 import Popup from "reactjs-popup";
 import { CreateNewTree } from "../../globalComponents/modals/CreateNewTree.tsx";
 import { Link } from "react-router-dom";
@@ -10,8 +10,9 @@ export const TreesViewRoute = () => {
     const { familyTrees: trees } = useSelector((root: RootState) => root.trees);
     const dispatch = useDispatch<AppDispatch>();
     const [popupOpen, setPopupOpen] = useState(false);
+    const userData = useSelector((root: RootState) => root.user);
     useEffect(() => {
-        dispatch(fetchTrees());
+        dispatch(fetchTrees(userData.jwt));
     }, [dispatch]);
     return (
         <main className="w-full min-h-[100vh] bg-mainBg text-default-color pt-[150px]">

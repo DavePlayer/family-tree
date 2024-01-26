@@ -3,23 +3,27 @@ import { TokenData } from "../userSlice.ts";
 import { jwtDecode } from "jwt-decode";
 
 export const validateJwt = createAsyncThunk("trees/validatejwt", async (token: string) =>
-    fetch(`${import.meta.env.VITE_API_URL}/api/account/validatejwt`, {
-        method: "POST",
-        body: `\"${token}\"`,
-        headers: {
-            "Content-type": "application/json",
-            Accept: "application/json",
-        },
-    })
+    fetch(
+        `${import.meta.env.VITE_API_URL}/api/account/validatejwt?jwt=${
+            token.length <= 0 ? "noToken" : token
+        }`,
+        {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json",
+                Accept: "application/json",
+            },
+        }
+    )
         .then((data) => {
             if (!data.ok) {
                 console.error(data);
-                throw new Error(JSON.stringify(data));
+                throw new Error(data.statusText);
             } else {
-                return data.text();
+                return data;
             }
         })
-        .then((token) => {
+        .then(() => {
             const tokenData: TokenData = jwtDecode(token);
             return {
                 tokenData,

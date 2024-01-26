@@ -80,24 +80,10 @@ const userSlice = createSlice({
         // ---------------------
         // validate JWT
         // ---------------------
-        builder.addCase(validateJwt.pending, (state, action) => {
-            // toast.dismiss(state.toastId);
-            state.toastId = toast.loading("loging in", {
-                autoClose: 5000,
-                closeButton: true,
-                closeOnClick: true,
-                toastId: `login${action.meta.requestId}`,
-            });
-        });
+        // builder.addCase(validateJwt.pending, (state, action) => {
+        //     // toast.dismiss(state.toastId);
+        // });
         builder.addCase(validateJwt.fulfilled, (state, action) => {
-            if (state.toastId)
-                toast.update(`login${action.meta.requestId}`, {
-                    render: "loged in successfully",
-                    type: "success",
-                    isLoading: false,
-                    autoClose: 2000,
-                });
-
             return {
                 ...state,
                 jwt: action.payload.jwt,
@@ -112,16 +98,14 @@ const userSlice = createSlice({
             };
         });
         builder.addCase(validateJwt.rejected, (state, payload) => {
-            if (state.toastId)
-                toast.update(`login${payload.meta.requestId}`, {
-                    render: "Token is not valid. login again please",
-                    type: "error",
-                    isLoading: false,
-                    autoClose: 5000,
-                });
-            // localStorage.removeItem("JWTtoken");
+            state.toastId = toast.error("Token expired. Please login again", {
+                autoClose: 5000,
+                closeButton: true,
+                closeOnClick: true,
+                toastId: `login${payload.meta.requestId}`,
+            });
+            localStorage.removeItem("JWTtoken");
             console.error(`${payload.error.code}: ${payload.error.message}`);
-            console.error(localStorage.getItem("JWTtoken"));
         });
     },
 });

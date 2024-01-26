@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Logo } from "./components/Logo.tsx";
 import { GradientText } from "./components/GradientText.tsx";
 import { toast } from "react-toastify";
@@ -6,7 +6,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { AppDispatch } from "./../../redux/store.ts";
 import { loginUser } from "../../redux/slices/userSlices/cases/login.ts";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { validateJwt } from "../../redux/slices/userSlices/cases/verifyToken.ts";
 
 export const LoginRoute = () => {
     const [loginData, setLoginData] = useState({ email: "", password: "" });
@@ -23,6 +24,13 @@ export const LoginRoute = () => {
             };
         });
     };
+
+    useEffect(() => {
+        // must be redone to another protector.
+        const tokenString = localStorage.getItem("JWTtoken");
+        if (!tokenString) console.error("token from local storage is null");
+        dispatch(validateJwt(tokenString || "")).then(() => navigate("/trees"));
+    }, []);
 
     const handleEmailSyntax = () => {
         const regex =

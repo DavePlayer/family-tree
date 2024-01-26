@@ -8,7 +8,7 @@ export const createNewTree = createAsyncThunk(
             console.log("thunk running");
             setTimeout(() => {
                 if (true) {
-                    res({ ...tree, id: 1 });
+                    res({ ...tree, id: "dasd" });
                 }
                 rej(new Error("test promise error"));
             }, 1000);

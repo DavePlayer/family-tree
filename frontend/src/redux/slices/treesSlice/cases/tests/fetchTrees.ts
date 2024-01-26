@@ -4,12 +4,12 @@ import * as d3 from "d3";
 
 const exampleTree: Array<Tree> = [
     {
-        id: 1,
+        id: "dsad",
         imgUrl: "https://static1.cbrimages.com/wordpress/wp-content/uploads/2022/04/spy-x-family-forger-family-is-a-great-family.jpg",
         name: "forger family",
     },
     {
-        id: 2,
+        id: "dasdasd",
         imgUrl: "https://i.ytimg.com/vi/dyVQzu-uO8E/maxresdefault.jpg",
         name: "dobranocny ogród",
     },
