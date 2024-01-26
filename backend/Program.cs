@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -64,6 +65,31 @@ builder.Services.AddCors(options => {
         builder
         .AllowAnyHeader()
         .AllowAnyOrigin();
+    });
+});
+
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme { 
+        In=ParameterLocation.Header,
+        Description = "Please inser token",
+        Name = "Authorization",
+        Type=SecuritySchemeType.Http,
+        BearerFormat="JWT",
+        Scheme="bearer"
+    
+    });
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement {
+        {
+        new OpenApiSecurityScheme {
+            Reference = new OpenApiReference {
+                Type=ReferenceType.SecurityScheme,
+                Id="Bearer"
+            }
+        },
+        new string[]{ }
+        }
     });
 });
 
