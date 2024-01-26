@@ -11,6 +11,8 @@ namespace family_tree_API.Services
         public Node AddNode(NodeDto dto);
         public Node editNode(NodeDto dto);
 
+        public Boolean deleteNode(string node_id);
+
     }
     public class NodeService : INodeService
     {
@@ -24,6 +26,34 @@ namespace family_tree_API.Services
             _contextAccessor = contextAccessor;
         }
 
+        private void deleteConnectionByNodeId(String nodeId)
+        {
+            List<Connection> connections = _context.Connections.Where(c => (c.To.ToString() == nodeId || c.From.ToString() == nodeId)).ToList();
+            if (connections.Count > 0)
+            {
+                _context.Connections.RemoveRange(connections);
+                _context.SaveChanges();
+            }
+        }
+
+        public bool deleteNode(string node_id)
+        {
+            Node? node = _context.Nodes.Where(n => n.Id.ToString() == node_id).FirstOrDefault();
+            if (node != null)
+            {
+                //List<Connection> connection_to_delete = _context.Connections.Where(n => n.From == node.Id && n.To == node.Id).ToList();
+                //foreach (Connection con in connection_to_delete) { 
+                //    _context.Connections.Remove(con);
+                //}
+                deleteConnectionByNodeId(node.Id.ToString());
+                _context.Nodes.Remove(node);
+                _context.SaveChanges();
+                return true;
+            }
+            else { 
+                return false;
+            }
+        }
 
         Node INodeService.AddNode(NodeDto dto)
         {

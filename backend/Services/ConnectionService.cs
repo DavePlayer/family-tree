@@ -10,6 +10,7 @@ namespace family_tree_API.Services
         public Connection AddConnection(ConnectionDto dto);
         public Connection editConnection(ConnectionDto dto);
 
+        public Boolean deleteConnection(string connection_id);
     }
 
     public class ConnectionService : IConnectionService
@@ -24,7 +25,19 @@ namespace family_tree_API.Services
             _contextAccessor = contextAccessor;
         }
 
+        public bool deleteConnection(string connection_id)
+        {
+            string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            Connection? connection = _context.Connections.Where(m => m.Id.ToString() == connection_id).FirstOrDefault();
+            if (connection != null)
+            {   
+                _context.Connections.Remove(connection);
+                _context.SaveChanges();
+                return true;
+            }
+            return false;
+        }
 
         Connection IConnectionService.AddConnection(ConnectionDto dto)
         {
