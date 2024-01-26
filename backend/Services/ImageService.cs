@@ -9,7 +9,7 @@ namespace family_tree_API.Services
 {
     public interface IImageService
     {
-        Task<string> Upload(IFormFile files, string tosaveid);
+        Task<string> Upload(IFormFile files);
     }
     public class ImageService : IImageService
     {
@@ -23,11 +23,11 @@ namespace family_tree_API.Services
         }
         
 
-        async Task<string> IImageService.Upload(IFormFile file, string toSaveId)
+        async Task<string> IImageService.Upload(IFormFile file)
         {
             //TO DO 
 
-
+            string toSaveId = Guid.NewGuid().ToString();
             // id famili membersa ktory jest w bazie do testow 8e341e16-57ef-42d6-a879-590689f18e2b
 
             var fileExtension = Path.GetExtension(file.FileName);
@@ -50,6 +50,8 @@ namespace family_tree_API.Services
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             //string userId = "2e3a4178-c4a6-4e66-9ecf-0bbc79d15404"; //only for testing 
 
+            //Wywalone zostało do ID jest generowane i poniższy kod nie ma sensu w takim przypadku
+            /*
             bool isFamilyMemberAssigned = _context.FamilyMembers
             .Any(fm => fm.UserId.ToString() == userId && fm.Id.ToString() == toSaveId); // jesli probujemy przypisac zdjecie o id familimembersa lub famili tree ktorych uzytkownik nie jest wlascicielem
 
@@ -64,7 +66,7 @@ namespace family_tree_API.Services
                     new Exception());
             }
 
-
+            */
             
 
             //Find path
@@ -77,7 +79,8 @@ namespace family_tree_API.Services
                 Directory.CreateDirectory(fileDirectoryPath);
             }
 
-
+            //Wywalone zostało do ID jest generowane i poniższy kod nie ma sensu w takim przypadku
+            /*
             if (isFamilyTreeAssigned)
             {
                 await addImageUrlToTrees(toSaveId, @"assets" + "/" + userId + "/" + toSaveId + fileExtension);
@@ -86,7 +89,7 @@ namespace family_tree_API.Services
             {
                 await addImageUrlToMembers(toSaveId, @"assets" + "/" + userId + "/" + toSaveId + fileExtension);
             }
-
+            */
 
 
 
