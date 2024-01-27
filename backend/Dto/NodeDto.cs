@@ -7,8 +7,8 @@
 
         public double PosY { get; set; }
 
-        public Guid FamilyTree { get; set; }
+        public Guid? FamilyTree { get; set; }
 
-        public Guid FamilyMember { get; set; }
+        public Guid? FamilyMember { get; set; }
     }
 }
