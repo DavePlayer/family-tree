@@ -27,7 +27,8 @@ import { createConnection } from "../../redux/slices/treesSlice/cases/tests/crea
 export const TreeEdit = () => {
     const params = useParams();
     const dispatch = useAppDispatch();
-    const { editedTree, user } = useSelector((root: RootState) => root);
+    const editedTree = useSelector((root: RootState) => root.editedTree);
+    const user = useSelector((root: RootState) => root.user);
     const [selectedFamMamber, setSelectedFamMember] = useState<string | null>(null);
     const latestEditedTree = useRef<EditedTree>(editedTree);
     const mapRef = useRef(null);
@@ -388,10 +389,14 @@ export const TreeEdit = () => {
                     ).then((d) => {
                         dispatch(
                             createNewNode({
-                                famMemId: (d.payload as FamilyMember).id,
-                                id: newId.toString(),
-                                posX: mouseX - imageSize / 2,
-                                posY: mouseY - imageSize / 2,
+                                node: {
+                                    id: newId.toString(),
+                                    posX: mouseX - imageSize / 2,
+                                    posY: mouseY - imageSize / 2,
+                                    familyMember: (d.payload as FamilyMember).id,
+                                    familyTree: editedTree.familyTree?.id || "",
+                                },
+                                token: user.jwt,
                             })
                         )
                             .then(() => shadow.attr("cx", -500).attr("cy", -500))
@@ -402,10 +407,14 @@ export const TreeEdit = () => {
                 if (latestEditedTree.current.MouseMode == MouseMode.CreateNode) {
                     dispatch(
                         createNewNode({
-                            famMemId: null,
-                            id: newId.toString(),
-                            posX: mouseX - nodeSize / 2,
-                            posY: mouseY - nodeSize / 2,
+                            node: {
+                                id: newId.toString(),
+                                posX: mouseX - imageSize / 2,
+                                posY: mouseY - imageSize / 2,
+                                familyTree: editedTree.familyTree?.id || "",
+                                familyMember: null,
+                            },
+                            token: user.jwt,
                         })
                     )
                         .then(() => shadow.attr("cx", -500).attr("cy", -500))

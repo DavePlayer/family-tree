@@ -28,7 +28,7 @@ export const LoginRoute = () => {
     useEffect(() => {
         // must be redone to another protector.
         const tokenString = localStorage.getItem("JWTtoken");
-        if (!tokenString) console.error("token from local storage is null");
+        if (!tokenString) return console.error("token from local storage is null");
         dispatch(validateJwt(tokenString || "")).then(() => navigate("/trees"));
     }, []);
 

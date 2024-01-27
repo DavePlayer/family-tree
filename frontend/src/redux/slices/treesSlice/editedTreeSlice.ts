@@ -44,7 +44,16 @@ export interface Node {
     id: string;
     posX: number;
     posY: number;
+    familyTree: string;
     famMemId: string | null;
+}
+
+export interface NodeNotParsed {
+    id: string;
+    posX: number;
+    posY: number;
+    familyTree: string;
+    familyMember: string | null;
 }
 
 export enum MouseMode {
@@ -57,7 +66,7 @@ export enum MouseMode {
 }
 
 export interface EditedTree {
-    tree: Tree | null;
+    familyTree: Tree | null;
     status: status;
     members: Array<FamilyMember>;
     nodes: Array<Node & { selected: boolean }>;
@@ -67,7 +76,7 @@ export interface EditedTree {
 }
 
 export interface EditedTreeNotExtended {
-    tree: Tree | null;
+    familyTree: Tree | null;
     members: Array<FamilyMember>;
     nodes: Array<Node>;
     connections: Array<NodeConnection>;
@@ -75,7 +84,7 @@ export interface EditedTreeNotExtended {
 
 // Define the initial state using that type
 const initialState: EditedTree = {
-    tree: null,
+    familyTree: null,
     status: status.pending,
     members: [],
     nodes: [],
@@ -131,10 +140,11 @@ export const treesSlice = createSlice({
             // add selected property to every node
             console.log(action.payload);
             const oldNodes = action.payload.nodes;
-            const newNodes = oldNodes.map((o: EditedTreeNotExtended) => {
+            const newNodes = oldNodes.map((o: NodeNotParsed) => {
                 return {
                     ...o,
                     selected: false,
+                    famMemId: o.familyMember,
                 };
             });
 

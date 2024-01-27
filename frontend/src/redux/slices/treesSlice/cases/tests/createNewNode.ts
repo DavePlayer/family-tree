@@ -1,16 +1,22 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { Node } from "../../editedTreeSlice.ts";
+import { NodeNotParsed } from "../../editedTreeSlice.ts";
 
 export const createNewNode = createAsyncThunk(
     "trees/createNodeMemberData",
-    async (node: Node) =>
-        new Promise<Node>((res, rej) => {
-            console.log("thunk running");
-            setTimeout(() => {
-                if (true) {
-                    res(node);
-                }
-                rej(new Error("test promise error"));
-            }, 1000);
+    async ({ node, token }: { node: NodeNotParsed; token: string }) =>
+        fetch(`${import.meta.env.VITE_API_URL}/node/addnode`, {
+            method: "POST",
+            body: JSON.stringify(node),
+            headers: {
+                "Content-type": "application/json;charset=utf-8",
+                Authorization: `Bearer ${token}`,
+            },
+        }).then((data) => {
+            if (!data.ok) {
+                console.error(data);
+                throw new Error(data.statusText);
+            } else {
+                return data.json();
+            }
         })
 );

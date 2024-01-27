@@ -99,7 +99,9 @@ export const ToolHeader = () => {
                         />
                     </div>
                 </div>
-                <h1 className="absolute z-[-1] l-0 w-full text-center">{editedTree.tree?.name}</h1>
+                <h1 className="absolute z-[-1] l-0 w-full text-center">
+                    {editedTree.familyTree?.name}
+                </h1>
                 <button onClick={() => navigate("/trees")} className="button orange">
                     Exit Tree
                 </button>

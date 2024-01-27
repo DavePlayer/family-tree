@@ -9,7 +9,7 @@ export const fetchEditerTreeData = createAsyncThunk(
             setTimeout(() => {
                 if (true) {
                     res({
-                        tree: {
+                        familyTree: {
                             id: treeId,
                             name: "test tree",
                             imgUrl: "",

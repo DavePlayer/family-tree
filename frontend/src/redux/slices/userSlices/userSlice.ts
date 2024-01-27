@@ -98,7 +98,7 @@ const userSlice = createSlice({
             };
         });
         builder.addCase(validateJwt.rejected, (state, payload) => {
-            state.toastId = toast.error("Token expired. Please login again", {
+            state.toastId = toast.error(`${payload.error.message}`, {
                 autoClose: 5000,
                 closeButton: true,
                 closeOnClick: true,
