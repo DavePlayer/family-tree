@@ -3,7 +3,7 @@ import { Id, toast } from "react-toastify";
 import { Tree } from "./treeSlice.ts";
 import { fetchEditerTreeData } from "./cases/fetchEditTreeData.ts";
 import { updateFamilyMemberData } from "./cases/tests/updateFamilyMemberData.ts";
-import { createFamilyMember } from "./cases/tests/craeteFamilyMember.ts";
+import { createFamilyMember } from "./cases/craeteFamilyMember.ts";
 import { createNewNode } from "./cases/createNewNode.ts";
 import { removeNode } from "./cases/RemoveNode.ts";
 import { removeConnection } from "./cases/tests/removeConnection.ts";

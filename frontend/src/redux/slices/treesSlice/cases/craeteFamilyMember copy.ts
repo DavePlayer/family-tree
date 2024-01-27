@@ -6,7 +6,7 @@ export const createFamilyMember = createAsyncThunk(
     async ({ member, token }: { member: FamilyMember; token: string }) =>
         fetch(`${import.meta.env.VITE_API_URL}/node/addnode`, {
             method: "POST",
-            body: JSON.stringify(node),
+            body: JSON.stringify(member),
             headers: {
                 "Content-type": "application/json;charset=utf-8",
                 Authorization: `Bearer ${token}`,

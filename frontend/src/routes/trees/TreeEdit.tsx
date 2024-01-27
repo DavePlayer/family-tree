@@ -17,7 +17,7 @@ import {
 } from "../../redux/slices/treesSlice/editedTreeSlice.ts";
 import Popup from "reactjs-popup";
 import { FamilyMemberInfo } from "../../globalComponents/modals/FamilyMemberInfo.tsx";
-import { createFamilyMember } from "../../redux/slices/treesSlice/cases/tests/craeteFamilyMember.ts";
+import { createFamilyMember } from "../../redux/slices/treesSlice/cases/craeteFamilyMember.ts";
 import { createNewNode } from "../../redux/slices/treesSlice/cases/createNewNode.ts";
 import { removeNode } from "../../redux/slices/treesSlice/cases/RemoveNode.ts";
 import { removeConnection } from "../../redux/slices/treesSlice/cases/tests/removeConnection.ts";
