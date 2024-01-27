@@ -149,12 +149,13 @@ namespace family_tree_API.Services
 
             tree.nodes = _context.Nodes.Where(n => n.FamilyTree.ToString() == treeId).ToList();
             tree.connections = _context.Connections.Where(c => c.FamilyTreeId.ToString() == treeId).ToList();
-            
+            tree.members = new List<FamilyMember>();
             foreach (Node node in tree.nodes)
             {
                 FamilyMember f = _context.FamilyMembers.Where(f => f.Id == node.FamilyMember).FirstOrDefault();
                 if (f != null)
                 {
+                    
                     tree.members.Add(f);
                 }
                 
