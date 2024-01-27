@@ -32,10 +32,10 @@ namespace family_tree_API.Services
 
             var fileExtension = Path.GetExtension(file.FileName);
 
-            if (file.Length > 1000000)// if file is greater than 3MB
+            if (file.Length > 3000000)// if file is greater than 3MB
             {
                 throw new BadRequestException(
-                       "Image size is to high, max 1MB",
+                       "Image size is to high, max 9MB",
                        new Exception());
             }
             if (fileExtension != ".png" && fileExtension != ".jpg")
@@ -62,7 +62,7 @@ namespace family_tree_API.Services
             if (!(isFamilyMemberAssigned || isFamilyTreeAssigned))
             {
                 throw new BadRequestException(
-                    "Can't sign this image to this user, image id: " + toSaveId + "user id: " + userId,
+                    "Can't sign this image to this user, image id: " + toSaveId + " user id: " + userId,
                     new Exception());
             }
 
