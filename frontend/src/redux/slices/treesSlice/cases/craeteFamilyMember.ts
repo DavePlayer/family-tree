@@ -22,7 +22,7 @@ export const createFamilyMember = createAsyncThunk(
             method: "POST",
             body: JSON.stringify({
                 ...member,
-                // birthDate: member.birthDate?.toLocaleDateString("en-CA"),
+                birthDate: member.birthDate?.toLocaleDateString("en-CA"),
                 // deathDate: member.deathDate?.toLocaleDateString("en-CA"),
             }),
             headers: {

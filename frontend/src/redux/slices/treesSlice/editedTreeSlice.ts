@@ -243,6 +243,7 @@ export const treesSlice = createSlice({
                     isLoading: false,
                     autoClose: 2000,
                 });
+            action.payload.birthDate = new Date(action.payload.birthDate);
             return { ...state, members: [...state.members, action.payload] };
         });
         builder.addCase(createFamilyMember.rejected, (state, payload) => {
