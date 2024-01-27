@@ -35,6 +35,7 @@ namespace family_tree_API.Services
                 Surname = dto.Surname,
                 BirthDate = dto.BirthDate,
                 DeathDate = dto.DeathDate,
+                Status = dto.Status,
                 AdditionalData = dto.AdditionalData,
             };
 
@@ -103,6 +104,7 @@ namespace family_tree_API.Services
             fm.Name = dto.Name;
             fm.BirthDate = dto.BirthDate;
             fm.DeathDate = dto.DeathDate;
+            fm.Status = dto.Status;
             fm.AdditionalData = dto.AdditionalData;
 
             _context.FamilyMembers.Update(fm);

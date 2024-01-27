@@ -20,6 +20,8 @@ public partial class FamilyMember
 
     public DateOnly? DeathDate { get; set; }
 
+    public string? Status { get; set; } 
+
     public string? AdditionalData { get; set; }
     [JsonIgnore]
     public virtual ICollection<Node> Nodes { get; set; } = new List<Node>();
