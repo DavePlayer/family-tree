@@ -374,12 +374,12 @@ export const TreeEdit = () => {
             ) {
                 shadow.style("opacity", 0.0);
                 dispatch(setMouseMode(MouseMode.None));
-                const newId = Math.floor(Math.random() * 500000);
+                const newId = editedTree.familyTree!.id || ""; // 100% sure it is here
                 const [mouseX, mouseY] = d3.pointer(event, focus.node());
                 if (latestEditedTree.current.MouseMode == MouseMode.Create) {
                     dispatch(
                         createFamilyMember({
-                            id: newId.toString(),
+                            id: newId,
                             userId: user.userData!.id, // here user will be in 100%
                             name: "New",
                             surname: "Member",
