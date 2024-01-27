@@ -101,6 +101,7 @@ namespace family_tree_API.Services
             }
             fm.Name = dto.Name;
             fm.Surname = dto.Surname;
+            fm.ImgUrl = dto.ImgUrl;
             fm.Name = dto.Name;
             fm.BirthDate = dto.BirthDate;
             fm.DeathDate = dto.DeathDate;
