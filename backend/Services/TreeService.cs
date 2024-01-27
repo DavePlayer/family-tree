@@ -152,7 +152,12 @@ namespace family_tree_API.Services
             
             foreach (Node node in tree.nodes)
             {
-                tree.members.Add(_context.FamilyMembers.Where(f=>f.Id ==  node.FamilyMember).FirstOrDefault());
+                FamilyMember f = _context.FamilyMembers.Where(f => f.Id == node.FamilyMember).FirstOrDefault();
+                if (f != null)
+                {
+                    tree.members.Add(f);
+                }
+                
             }                   
 
             if (tree.members == null)
