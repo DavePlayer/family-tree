@@ -23,6 +23,7 @@ import { removeNode } from "../../redux/slices/treesSlice/cases/RemoveNode.ts";
 import { removeConnection } from "../../redux/slices/treesSlice/cases/tests/removeConnection.ts";
 import { toast } from "react-toastify";
 import { createConnection } from "../../redux/slices/treesSlice/cases/tests/createConnection.ts";
+import { getImage } from "../../globalComponents/functions/getImages.ts";
 
 export const TreeEdit = () => {
     const params = useParams();
@@ -164,19 +165,36 @@ export const TreeEdit = () => {
         // inserting images into family member nodes
         nodeEnter
             .append("image")
-            // @ts-ignore
-            .attr("xlink:href", (d) => {
+            .each(function (d) {
+                const image = d3.select(this);
+
                 if (d.famMemId) {
                     const [familyMember] = latestEditedTree.current.members.filter(
                         (member) => member.id === d.famMemId
                     );
-                    return familyMember
-                        ? familyMember.imgUrl
-                            ? familyMember.imgUrl
-                            : userImg
-                        : "#";
+                    if (familyMember && familyMember.imgUrl) {
+                        // Fetch the image using your getImage function
+                        getImage(user.jwt, familyMember.imgUrl)
+                            .then((blob) => {
+                                // Convert the Blob to a data URL
+                                const imageUrl = URL.createObjectURL(blob);
+
+                                // Set the xlink:href attribute with the fetched image URL
+                                image.attr("xlink:href", imageUrl);
+                            })
+                            .catch((error) => {
+                                console.error(error);
+                                image.attr("xlink:href", userImg);
+                                console.log("ERROR IN GETING MEMBER IMAGE");
+                            });
+                    } else {
+                        // Set a default image if no family member or image URL is available
+                        image.attr("xlink:href", userImg);
+                    }
+                } else {
+                    // Set a default image for nodes without a family member
+                    image.attr("xlink:href", "#");
                 }
-                return "#";
             })
             .attr("width", (d) => (d.famMemId ? imageSize : nodeSize))
             .attr("height", (d) => (d.famMemId ? imageSize : nodeSize))
@@ -498,18 +516,36 @@ export const TreeEdit = () => {
             svg.selectAll(".nodes")
                 .select("image")
                 // @ts-ignore
-                .attr("xlink:href", (d: any) => {
+                .each(function (d: Node) {
+                    const image = d3.select(this);
+
                     if (d.famMemId) {
                         const [familyMember] = latestEditedTree.current.members.filter(
                             (member) => member.id === d.famMemId
                         );
-                        return familyMember
-                            ? familyMember.imgUrl
-                                ? familyMember.imgUrl
-                                : userImg
-                            : "#";
+                        if (familyMember && familyMember.imgUrl) {
+                            // Fetch the image using your getImage function
+                            getImage(user.jwt, familyMember.imgUrl)
+                                .then((blob) => {
+                                    // Convert the Blob to a data URL
+                                    const imageUrl = URL.createObjectURL(blob);
+
+                                    // Set the xlink:href attribute with the fetched image URL
+                                    image.attr("xlink:href", imageUrl);
+                                })
+                                .catch((error) => {
+                                    console.error(error);
+                                    image.attr("xlink:href", userImg);
+                                    console.log("ERROR IN GETING MEMBER IMAGE");
+                                });
+                        } else {
+                            // Set a default image if no family member or image URL is available
+                            image.attr("xlink:href", userImg);
+                        }
+                    } else {
+                        // Set a default image for nodes without a family member
+                        image.attr("xlink:href", "#");
                     }
-                    return "#";
                 });
         };
         simulation.on("tick", updateNodes);
