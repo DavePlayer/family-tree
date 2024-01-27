@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace family_tree_API.Models;
@@ -11,6 +12,7 @@ public partial class FamilyTree
     public Guid UserId { get; set; }
 
     public string Name { get; set; } = null!;
+
 
     public string? ImgUrl { get; set; }
     [JsonIgnore]
