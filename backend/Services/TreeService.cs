@@ -26,7 +26,7 @@ namespace family_tree_API.Services
 
         FamilyTree editTree(FamilyTreeDto dto);
 
-        Array getWholeTree(String treeId);
+        Array getWholeTree(string treeId);
     }
     public class TreeService : ITreeService
     {
@@ -140,30 +140,46 @@ namespace family_tree_API.Services
             return tree;
         }
 
-        Array ITreeService.getWholeTree(String treeId)
+        Array ITreeService.getWholeTree(string treeId)
         {
             Object[] tab = new Object[4];
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            FamilyTree? FamTree = _context.FamilyTrees.Where(t=> (t.Id.ToString() == treeId && t.UserId.ToString() == userId)).FirstOrDefault();
+            FamilyTree FamTree = _context.FamilyTrees.Where(tree => tree.Id.ToString().Equals(treeId) && tree.UserId.ToString().Equals(userId)).FirstOrDefault();
 
-            if(FamTree != null)
+            List<Node> nodes = _context.Nodes.Where(n => n.FamilyTree.ToString() == treeId).ToList();
+            List<Connection> connections = _context.Connections.Where(c => c.FamilyTreeId.ToString() == treeId).ToList();
+            List<FamilyMember> members = new List<FamilyMember>();
+               
+            if (nodes.Count > 0)
             {
-                List <Node> nodes = _context.Nodes.Where(n=> n.FamilyTree.ToString() == treeId).ToList();
-                List <Connection> connections = _context.Connections.Where(c => c.FamilyTreeId.ToString() == treeId).ToList();
-                if (nodes.Count > 0)
+                   
+                foreach (Node node in nodes)
                 {
-                    List <FamilyMember> members = new List<FamilyMember>();
-                    foreach (Node node in nodes)
-                    {
-                        members.Add(_context.FamilyMembers.Where(f=>f.Id ==  node.FamilyMember).FirstOrDefault());
-                    }
-                    tab[0] = FamTree;
-                    tab[1] = members;
-                    tab[2] = nodes;
-                    tab[3] = connections;
-                }
+                    members.Add(_context.FamilyMembers.Where(f=>f.Id ==  node.FamilyMember).FirstOrDefault());
+                }                   
             }
+    
+            tab[0] = FamTree;
+
+            if (members == null)
+            {
+                tab[1] = Array.Empty<FamilyMember>().ToList();
+            }
+            else { tab[1] = members; }
+
+            if (nodes == null)
+            {
+                tab[2] = Array.Empty<Node>().ToList();
+            }
+            else { tab[2] = nodes; }
+
+            if (connections == null)
+            {
+                tab[3] = Array.Empty<Connection>().ToList();
+            }
+            else { tab[3] = connections; }
+
             return tab;
         }
     }

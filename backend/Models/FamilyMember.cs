@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace family_tree_API.Models;
@@ -19,6 +20,8 @@ public partial class FamilyMember
     public DateOnly? BirthDate { get; set; }
 
     public DateOnly? DeathDate { get; set; }
+
+    public string? Status { get; set; } 
 
     public string? AdditionalData { get; set; }
     [JsonIgnore]

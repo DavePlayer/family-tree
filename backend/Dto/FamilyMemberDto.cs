@@ -15,6 +15,8 @@ namespace family_tree_API.Dto
 
         public DateOnly? DeathDate { get; set; }
 
+        public string? Status { get; set; }
+
         public string? AdditionalData { get; set; }
     }
 }
