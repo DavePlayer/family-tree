@@ -12,9 +12,9 @@ public partial class Node
 
     public double PosY { get; set; }
 
-    public Guid FamilyTree { get; set; }
+    public Guid? FamilyTree { get; set; }
 
-    public Guid FamilyMember { get; set; }
+    public Guid? FamilyMember { get; set; }
     [JsonIgnore]
     public virtual ICollection<Connection> ConnectionFromNavigations { get; set; } = new List<Connection>();
     [JsonIgnore]
