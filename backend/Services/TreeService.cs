@@ -158,10 +158,31 @@ namespace family_tree_API.Services
                     {
                         members.Add(_context.FamilyMembers.Where(f=>f.Id ==  node.FamilyMember).FirstOrDefault());
                     }
-                    tab[0] = FamTree;
-                    tab[1] = members;
-                    tab[2] = nodes;
-                    tab[3] = connections;
+
+                    if (FamTree == null)
+                    {
+                        tab[0] = Array.Empty<FamilyTree>().ToList();
+                    }
+                    else { tab[0] = FamTree; }
+
+                    if (members == null)
+                    {
+                        tab[1] = Array.Empty<FamilyMember>().ToList();
+                    }
+                    else { tab[1] = members; }
+
+                    if (nodes == null)
+                    {
+                        tab[2] = Array.Empty<Node>().ToList();
+                    }
+                    else { tab[2] = nodes; }
+
+                    if (connections == null)
+                    {
+                        tab[3] = Array.Empty<Connection>().ToList();
+                    }
+                    else { tab[3] = connections; }
+                    
                 }
             }
             return tab;
