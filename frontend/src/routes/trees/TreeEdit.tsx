@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { RootState, useAppDispatch } from "../../redux/store";
-import { fetchEditerTreeData } from "../../redux/slices/treesSlice/cases/tests/fetchEditTreeData";
+import { fetchEditerTreeData } from "../../redux/slices/treesSlice/cases/fetchEditTreeData";
 import { useEffect, useRef, useState } from "react";
 import userImg from "../../assets/user_image.png";
 import * as d3 from "d3";
@@ -34,7 +34,7 @@ export const TreeEdit = () => {
     const { width: famTreeWidth, height: famTreeHeight } = useContainerDimensions(mapRef);
 
     useEffect(() => {
-        dispatch(fetchEditerTreeData(params.id || "-1"));
+        dispatch(fetchEditerTreeData({ treeId: params.id || "-1", token: user.jwt }));
     }, []);
     useEffect(() => {
         latestEditedTree.current = editedTree;

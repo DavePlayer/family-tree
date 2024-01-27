@@ -1,7 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { Id, toast } from "react-toastify";
 import { Tree } from "./treeSlice.ts";
-import { fetchEditerTreeData } from "./cases/tests/fetchEditTreeData.ts";
+import { fetchEditerTreeData } from "./cases/fetchEditTreeData.ts";
 import { updateFamilyMemberData } from "./cases/tests/updateFamilyMemberData.ts";
 import { createFamilyMember } from "./cases/tests/craeteFamilyMember.ts";
 import { createNewNode } from "./cases/tests/createNewNode.ts";
@@ -129,8 +129,9 @@ export const treesSlice = createSlice({
         });
         builder.addCase(fetchEditerTreeData.fulfilled, (state, action) => {
             // add selected property to every node
+            console.log(action.payload);
             const oldNodes = action.payload.nodes;
-            const newNodes = oldNodes.map((o) => {
+            const newNodes = oldNodes.map((o: EditedTreeNotExtended) => {
                 return {
                     ...o,
                     selected: false,
