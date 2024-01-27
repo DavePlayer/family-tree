@@ -60,14 +60,14 @@ namespace family_tree_API.Services
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             //sprawdzenie czy członek rodziny i drzewo należą do osoby dodającej Nod'a
-            FamilyMember? famMem = _context.FamilyMembers.Single(m => (m.Id.Equals(dto.FamilyMember)));
+           /* FamilyMember? famMem = _context.FamilyMembers.Where(m => (m.Id.Equals(dto.FamilyMember))).FirstOrDefault();
             FamilyTree? famTree = _context.FamilyTrees.Where(t => t.Id == dto.FamilyTree).FirstOrDefault();
 
             if (famMem == null || !famMem.UserId.ToString().Equals(userId) || famTree == null || !famTree.UserId.ToString().Equals(userId))
             {
                 throw new BadRequestException("Family tree or family member belongs to other user or does not exist", new Exception());
             }
-
+            */
             Node node = new Node()
             {
                 Id = Guid.NewGuid(),
