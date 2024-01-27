@@ -1,12 +1,11 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { NodeNotParsed } from "../editedTreeSlice.ts";
 
-export const createNewNode = createAsyncThunk(
-    "trees/createNodeMemberData",
+export const removeNode = createAsyncThunk(
+    "trees/removeNodeMemberData",
     async ({ node, token }: { node: NodeNotParsed; token: string }) =>
-        fetch(`${import.meta.env.VITE_API_URL}/node/addnode`, {
-            method: "POST",
-            body: JSON.stringify(node),
+        fetch(`${import.meta.env.VITE_API_URL}/node/deletenode?id=${node.id}`, {
+            method: "DELETE",
             headers: {
                 "Content-type": "application/json;charset=utf-8",
                 Authorization: `Bearer ${token}`,
@@ -16,7 +15,7 @@ export const createNewNode = createAsyncThunk(
                 console.error(data);
                 throw new Error(data.statusText);
             } else {
-                return data.json();
+                return node;
             }
         })
 );

@@ -18,8 +18,8 @@ import {
 import Popup from "reactjs-popup";
 import { FamilyMemberInfo } from "../../globalComponents/modals/FamilyMemberInfo.tsx";
 import { createFamilyMember } from "../../redux/slices/treesSlice/cases/tests/craeteFamilyMember.ts";
-import { createNewNode } from "../../redux/slices/treesSlice/cases/tests/createNewNode.ts";
-import { removeNode } from "../../redux/slices/treesSlice/cases/tests/RemoveNode.ts";
+import { createNewNode } from "../../redux/slices/treesSlice/cases/createNewNode.ts";
+import { removeNode } from "../../redux/slices/treesSlice/cases/RemoveNode.ts";
 import { removeConnection } from "../../redux/slices/treesSlice/cases/tests/removeConnection.ts";
 import { toast } from "react-toastify";
 import { createConnection } from "../../redux/slices/treesSlice/cases/tests/createConnection.ts";
@@ -287,7 +287,18 @@ export const TreeEdit = () => {
 
         function nodeMouseClick(this: any, _: any, d: Node & { selected: boolean }) {
             if (latestEditedTree.current.MouseMode == MouseMode.Delete) {
-                dispatch(removeNode(d));
+                dispatch(
+                    removeNode({
+                        node: {
+                            id: d.id,
+                            familyMember: d.famMemId,
+                            familyTree: d.familyTree,
+                            posX: d.posX,
+                            posY: d.posY,
+                        },
+                        token: user.jwt,
+                    })
+                );
             } else if (latestEditedTree.current.MouseMode == MouseMode.RmLink) {
                 const selected = latestEditedTree.current.nodes.find((o) => o.selected);
                 if (!selected) {
@@ -409,8 +420,8 @@ export const TreeEdit = () => {
                         createNewNode({
                             node: {
                                 id: newId.toString(),
-                                posX: mouseX - imageSize / 2,
-                                posY: mouseY - imageSize / 2,
+                                posX: mouseX - nodeSize / 2,
+                                posY: mouseY - nodeSize / 2,
                                 familyTree: editedTree.familyTree?.id || "",
                                 familyMember: null,
                             },

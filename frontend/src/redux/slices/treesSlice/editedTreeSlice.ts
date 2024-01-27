@@ -4,8 +4,8 @@ import { Tree } from "./treeSlice.ts";
 import { fetchEditerTreeData } from "./cases/fetchEditTreeData.ts";
 import { updateFamilyMemberData } from "./cases/tests/updateFamilyMemberData.ts";
 import { createFamilyMember } from "./cases/tests/craeteFamilyMember.ts";
-import { createNewNode } from "./cases/tests/createNewNode.ts";
-import { removeNode } from "./cases/tests/RemoveNode.ts";
+import { createNewNode } from "./cases/createNewNode.ts";
+import { removeNode } from "./cases/RemoveNode.ts";
 import { removeConnection } from "./cases/tests/removeConnection.ts";
 import { createConnection } from "./cases/tests/createConnection.ts";
 
@@ -268,7 +268,12 @@ export const treesSlice = createSlice({
                     isLoading: false,
                     autoClose: 2000,
                 });
-            return { ...state, nodes: [...state.nodes, { ...action.payload, selected: false }] };
+            const newNode = {
+                famMemId: action.payload.familyMember,
+                selected: false,
+                ...action.payload,
+            };
+            return { ...state, nodes: [...state.nodes, newNode] };
         });
         builder.addCase(createNewNode.rejected, (state, payload) => {
             if (state && state.toastId)
@@ -316,7 +321,7 @@ export const treesSlice = createSlice({
                     isLoading: false,
                     autoClose: 2000,
                 });
-            console.error(`${payload.error.code}: ${payload.error.message}`);
+            console.error(`${payload.error.code}: ${payload.error.message}`, payload.error);
         });
 
         // ---------------------
