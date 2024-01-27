@@ -8,8 +8,8 @@ export const updateFamilyMemberData = createAsyncThunk(
             console.log("thunk running");
             data.famMember = {
                 ...data.famMember,
-                img_url: data.image ? URL.createObjectURL(data.image) : data.famMember.img_url
-            }
+                imgUrl: data.image ? URL.createObjectURL(data.image) : data.famMember.imgUrl,
+            };
             setTimeout(() => {
                 if (true) {
                     res(data.famMember);

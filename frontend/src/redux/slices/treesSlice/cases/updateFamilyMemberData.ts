@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
-export const createFamilyMember = createAsyncThunk(
-    "trees/createFamilyMemberData",
+export const updateFamilyMemberData = createAsyncThunk(
+    "trees/updateFamilyMemberData",
     async ({
         member,
         token,
@@ -18,12 +18,13 @@ export const createFamilyMember = createAsyncThunk(
         };
         token: string;
     }) =>
-        fetch(`${import.meta.env.VITE_API_URL}/member/addfamilymember`, {
+        fetch(`${import.meta.env.VITE_API_URL}/member/editfamilymember`, {
             method: "POST",
             body: JSON.stringify({
                 ...member,
-                birthDate: member.birthDate?.toLocaleDateString("en-CA"),
-                // deathDate: member.deathDate?.toLocaleDateString("en-CA"),
+                birthDate: member.birthDate ? member.birthDate?.toLocaleDateString("en-CA") : null,
+                deathDate: member.deathDate ? member.deathDate?.toLocaleDateString("en-CA") : null,
+                imgUrl: member.imgUrl ? member.imgUrl : null,
             }),
             headers: {
                 "Content-type": "application/json;charset=utf-8",

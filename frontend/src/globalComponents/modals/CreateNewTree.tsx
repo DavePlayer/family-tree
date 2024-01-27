@@ -29,7 +29,6 @@ export const CreateNewTree: React.FC<{ close: () => void }> = ({ close }) => {
                     token: userData.jwt,
                 })
             ).then((a) => {
-                console.log("SUPPOSED IMAGE URL", a);
                 return dispatch(
                     createNewTree({
                         token: userData.jwt,

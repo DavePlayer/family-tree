@@ -6,14 +6,17 @@ import EditIcon from "./../../assets/edit.svg?react";
 import SaveIcon from "./../../assets/save.svg?react";
 import DownloadIcon from "./../../assets/download.svg?react";
 import "react-datepicker/dist/react-datepicker.css";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../redux/store.ts";
-import { updateFamilyMemberData } from "../../redux/slices/treesSlice/cases/tests/updateFamilyMemberData.ts";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../redux/store.ts";
+import { updateFamilyMemberData } from "../../redux/slices/treesSlice/cases/updateFamilyMemberData.ts";
+import { getImage } from "../functions/getImages.ts";
+import { uploadImage } from "../functions/uploadImageCase.ts";
 
 export const FamilyMemberInfo = ({ famMember, close }: { famMember: FamilyMember; close: any }) => {
     const [member, setMember] = useState<FamilyMember>();
     const [isEditMode, setIsEditMode] = useState(false);
     const dispatch = useDispatch<AppDispatch>();
+    const user = useSelector((root: RootState) => root.user);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const handleFile = (file: File) => {
@@ -24,6 +27,10 @@ export const FamilyMemberInfo = ({ famMember, close }: { famMember: FamilyMember
 
     useEffect(() => {
         setMember(famMember);
+        if (famMember.imgUrl)
+            getImage(user.jwt, famMember.imgUrl).then((image) =>
+                setSelectedFile(new File([image], "userimage"))
+            );
     }, []);
 
     const toggleEdit = () => {
@@ -34,23 +41,57 @@ export const FamilyMemberInfo = ({ famMember, close }: { famMember: FamilyMember
                 member.status = "alive";
             }
             if (member) {
-                dispatch(
-                    updateFamilyMemberData({
-                        famMember: member,
-                        image: selectedFile || undefined,
-                    })
-                ).then(() => {
-                    setMember((prev) => {
-                        if (prev) {
-                            return {
-                                ...prev,
-                                img_url: selectedFile
-                                    ? URL.createObjectURL(selectedFile)
-                                    : prev.imgUrl,
-                            };
-                        }
+                if (selectedFile) {
+                    dispatch(uploadImage({ file: selectedFile, token: user.jwt })).then((a) => {
+                        console.log("SENT PHOTO> NOW UPDATEING IMAGE: ", a.payload);
+                        dispatch(
+                            updateFamilyMemberData({
+                                member: {
+                                    birthDate: member.birthDate,
+                                    deathDate: member.deathDate,
+                                    id: member.id,
+                                    imgUrl: `${import.meta.env.VITE_API_URL}/assets/${(
+                                        a.payload as string
+                                    ).replace(/\"/g, "")}`,
+                                    name: member.name,
+                                    surname: member.surname,
+                                    status: member.status,
+                                    additionalData: member.additionalData,
+                                },
+                                token: user.jwt,
+                            })
+                        ).catch((err) => {
+                            console.error(err);
+                        });
                     });
-                });
+                } else {
+                    dispatch(
+                        updateFamilyMemberData({
+                            member: {
+                                birthDate: member.birthDate,
+                                deathDate: member.deathDate,
+                                id: member.id,
+                                imgUrl: null,
+                                name: member.name,
+                                surname: member.surname,
+                                status: member.status,
+                                additionalData: member.additionalData,
+                            },
+                            token: user.jwt,
+                        })
+                    ).then(() => {
+                        setMember((prev) => {
+                            if (prev) {
+                                return {
+                                    ...prev,
+                                    img_url: selectedFile
+                                        ? URL.createObjectURL(selectedFile)
+                                        : prev.imgUrl,
+                                };
+                            }
+                        });
+                    });
+                }
             }
             return !prev;
         });
@@ -145,7 +186,7 @@ export const FamilyMemberInfo = ({ famMember, close }: { famMember: FamilyMember
                     ) : (
                         <figure className="rounded-full overflow-hidden w-1/4 aspect-square flex items-center">
                             <img
-                                src={member.imgUrl}
+                                src={selectedFile ? URL.createObjectURL(selectedFile) : ""}
                                 alt="user image"
                                 className="h-full w-full text-center flex justify-center items-center"
                             />

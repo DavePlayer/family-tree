@@ -398,7 +398,7 @@ export const TreeEdit = () => {
                                 deathDate: null,
                                 status: "alive",
                                 additionalData: "",
-                                imgUrl: "",
+                                imgUrl: null,
                             },
                             token: user.jwt,
                         })

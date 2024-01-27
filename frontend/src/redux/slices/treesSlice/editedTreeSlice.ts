@@ -2,12 +2,13 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { Id, toast } from "react-toastify";
 import { Tree } from "./treeSlice.ts";
 import { fetchEditerTreeData } from "./cases/fetchEditTreeData.ts";
-import { updateFamilyMemberData } from "./cases/tests/updateFamilyMemberData.ts";
+import { updateFamilyMemberData } from "./cases/updateFamilyMemberData.ts";
 import { createFamilyMember } from "./cases/craeteFamilyMember.ts";
 import { createNewNode } from "./cases/createNewNode.ts";
 import { removeNode } from "./cases/RemoveNode.ts";
 import { removeConnection } from "./cases/tests/removeConnection.ts";
 import { createConnection } from "./cases/tests/createConnection.ts";
+import { uploadImage } from "../../../globalComponents/functions/uploadImageCase.ts";
 
 enum status {
     pending,
@@ -27,10 +28,10 @@ export interface FamilyMember {
     imgUrl?: string;
     name: string;
     surname: string;
-    status?: string;
+    status: string;
     birthDate: Date | null;
     deathDate: Date | null;
-    additionalData?: string;
+    additionalData: string;
 }
 
 export interface NodeConnection {
@@ -73,6 +74,7 @@ export interface EditedTree {
     connections: Array<NodeConnection>;
     toastId?: Id;
     MouseMode: MouseMode;
+    tempImageAddr?: string;
 }
 
 export interface EditedTreeNotExtended {
@@ -200,9 +202,12 @@ export const treesSlice = createSlice({
             state.status = status.loading;
         });
         builder.addCase(updateFamilyMemberData.fulfilled, (state, action) => {
-            const newMembers = state.members.map((mem) =>
-                mem.id !== action.payload.id ? mem : action.payload
-            );
+            action.payload.birthDate = action.payload.birthDate
+                ? new Date(action.payload.birthDate)
+                : null;
+            action.payload.deathDate = action.payload.deathDate
+                ? new Date(action.payload.deathDate)
+                : null;
             if (state.toastId)
                 toast.update(state.toastId, {
                     render: "updates member successfully",
@@ -210,7 +215,13 @@ export const treesSlice = createSlice({
                     isLoading: false,
                     autoClose: 2000,
                 });
-            return { ...state, members: newMembers };
+            return {
+                ...state,
+                members: [
+                    ...state.members.filter((o) => o.id != action.payload.id),
+                    action.payload,
+                ],
+            };
         });
         builder.addCase(updateFamilyMemberData.rejected, (state, payload) => {
             if (state && state.toastId)
@@ -424,6 +435,26 @@ export const treesSlice = createSlice({
                     isLoading: false,
                     autoClose: 2000,
                 });
+            console.error(`${payload.error.code}: ${payload.error.message}`);
+        });
+
+        // ---------------------
+        // Upload image to tree
+        // ---------------------
+        builder.addCase(uploadImage.pending, (state) => {
+            state.status = status.loading;
+        });
+        builder.addCase(uploadImage.fulfilled, (state, action) => {
+            state.status = status.loaded;
+            state.tempImageAddr = `${import.meta.env.VITE_API_URL}/assets/${action.payload}`;
+        });
+        builder.addCase(uploadImage.rejected, (state, payload) => {
+            toast.update(`imageUpload`, {
+                render: "failed to upload image",
+                type: "error",
+                isLoading: false,
+                autoClose: 2000,
+            });
             console.error(`${payload.error.code}: ${payload.error.message}`);
         });
     },
