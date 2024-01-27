@@ -59,14 +59,14 @@ builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddDbContext<FamilyTreeContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("familyTreeContext")));
 builder.Services.AddScoped<ErrorHandlingMiddleware>();
 builder.Services.AddScoped<StaticFileAuthorizationMiddleware>();
-builder.Services.AddCors(options => {
-    options.AddPolicy("CorsPolicy", builder =>
-    {
-        builder
-        .AllowAnyHeader()
-        .AllowAnyOrigin();
-    });
-});
+//builder.Services.AddCors(options => {
+//    options.AddPolicy("CorsPolicy", builder =>
+//    {
+//        builder
+//        .AllowAnyHeader()
+//        .AllowAnyOrigin();
+//    });
+//});
 
 
 builder.Services.AddSwaggerGen(options =>
@@ -103,7 +103,9 @@ builder.Services.AddCors(options =>
                           policy.WithOrigins("http://localhost",
                                               "http://127.0.0.1")
                                             .AllowAnyHeader()
-                                            .AllowAnyMethod();
+                                            .AllowAnyMethod()
+                                            .WithHeaders("GET,PUSH,DELETE,POST");
+                                            
                       });
 });
 if (app.Environment.IsDevelopment())
