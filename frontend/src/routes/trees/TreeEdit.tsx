@@ -390,12 +390,17 @@ export const TreeEdit = () => {
                 if (latestEditedTree.current.MouseMode == MouseMode.Create) {
                     dispatch(
                         createFamilyMember({
-                            id: newId,
-                            userId: user.userData!.id, // here user will be in 100%
-                            name: "New",
-                            surname: "Member",
-                            birthDate: new Date(Date.now()),
-                            deathDate: null,
+                            member: {
+                                id: newId,
+                                name: "New",
+                                surname: "Member",
+                                birthDate: null,
+                                deathDate: null,
+                                status: "dead",
+                                additionalData: "",
+                                imgUrl: "",
+                            },
+                            token: user.jwt,
                         })
                     ).then((d) => {
                         dispatch(

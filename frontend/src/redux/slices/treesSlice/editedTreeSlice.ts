@@ -147,6 +147,13 @@ export const treesSlice = createSlice({
                     famMemId: o.familyMember,
                 };
             });
+            const newMembers = action.payload.members.map((member: FamilyMember) => {
+                return {
+                    ...member,
+                    birthDate: member.birthDate ? new Date(member.birthDate) : null,
+                    deathDate: member.deathDate ? new Date(member.deathDate) : null,
+                };
+            });
 
             // initialize new State with new properties
             const newState: EditedTree = {
@@ -154,6 +161,7 @@ export const treesSlice = createSlice({
                 status: status.loaded,
                 ...action.payload,
                 nodes: newNodes,
+                members: newMembers,
             };
 
             // give info abut fetching tree
