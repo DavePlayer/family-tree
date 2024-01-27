@@ -27,14 +27,14 @@ import { createConnection } from "../../redux/slices/treesSlice/cases/tests/crea
 export const TreeEdit = () => {
     const params = useParams();
     const dispatch = useAppDispatch();
-    const editedTree = useSelector((root: RootState) => root.editedTree);
-    const [selectedFamMamber, setSelectedFamMember] = useState<number | null>(null);
+    const { editedTree, user } = useSelector((root: RootState) => root);
+    const [selectedFamMamber, setSelectedFamMember] = useState<string | null>(null);
     const latestEditedTree = useRef<EditedTree>(editedTree);
     const mapRef = useRef(null);
     const { width: famTreeWidth, height: famTreeHeight } = useContainerDimensions(mapRef);
 
     useEffect(() => {
-        dispatch(fetchEditerTreeData(parseInt(params.id || "-1")));
+        dispatch(fetchEditerTreeData(params.id || "-1"));
     }, []);
     useEffect(() => {
         latestEditedTree.current = editedTree;
@@ -94,9 +94,11 @@ export const TreeEdit = () => {
             const target = nodesData.find((node) => node.id === d.to);
 
             if (source && target) {
-                return `M${source.posX + (source.famMemId ? imageSize / 2 : nodeSize / 2)},${source.posY + (source.famMemId ? imageSize / 2 : nodeSize / 2)
-                    } L${target.posX + (target.famMemId ? imageSize / 2 : nodeSize / 2)},${target.posY + (target.famMemId ? imageSize / 2 : nodeSize / 2)
-                    }`;
+                return `M${source.posX + (source.famMemId ? imageSize / 2 : nodeSize / 2)},${
+                    source.posY + (source.famMemId ? imageSize / 2 : nodeSize / 2)
+                } L${target.posX + (target.famMemId ? imageSize / 2 : nodeSize / 2)},${
+                    target.posY + (target.famMemId ? imageSize / 2 : nodeSize / 2)
+                }`;
             } else {
                 // Handle cases where source or target is not found
                 return "";
@@ -168,8 +170,8 @@ export const TreeEdit = () => {
                         (member) => member.id === d.famMemId
                     );
                     return familyMember
-                        ? familyMember.img_url
-                            ? familyMember.img_url
+                        ? familyMember.imgUrl
+                            ? familyMember.imgUrl
                             : userImg
                         : "#";
                 }
@@ -182,7 +184,7 @@ export const TreeEdit = () => {
             })
             .attr("clip-path", (d) => `url(#clipPath${d.id})`)
             .on("error", function () {
-                d3.select(this).attr("xlink:href", "#");
+                d3.select(this).attr("xlink:href", (d: any) => (d.famMemId ? userImg : "#"));
             });
 
         nodeEnter
@@ -193,7 +195,7 @@ export const TreeEdit = () => {
                 const member = latestEditedTree.current.members.find(
                     (mem) => mem.id === d.famMemId
                 );
-                const titleToDisplay = d.famMemId ? member?.name || "" : "";
+                const titleToDisplay = d.famMemId ? `${member?.name} ${member?.surname}` || "" : "";
 
                 return titleToDisplay;
             })
@@ -205,7 +207,7 @@ export const TreeEdit = () => {
                 const member = latestEditedTree.current.members.find(
                     (mem) => mem.id === d.famMemId
                 );
-                const titleToDisplay = d.famMemId ? member?.name || "" : "";
+                const titleToDisplay = d.famMemId ? `${member?.name} ${member?.surname}` || "" : "";
 
                 // ayo that's sick. ugly and slow in performance but works
                 const tempText = document.createElementNS("http://www.w3.org/2000/svg", "text");
@@ -228,25 +230,14 @@ export const TreeEdit = () => {
                 return d.selected ? "#fff" : "#FD7900";
             });
 
-        function nodeMouseover(
-            this: any,
-            _: any,
-            d: {
-                id: number;
-                posX: number;
-                posY: number;
-                famMemId: number | null;
-                x: number;
-                y: number;
-            }
-        ) {
+        function nodeMouseover(this: any, _: any, d: Node) {
             if (d.famMemId) {
                 const theNode = d3.select(this);
 
                 const member = latestEditedTree.current.members.find(
                     (mem) => mem.id === d.famMemId
                 );
-                const titleToDisplay = d.famMemId ? member?.name || "" : "";
+                const titleToDisplay = d.famMemId ? `${member?.name} ${member?.surname}` || "" : "";
 
                 // Append temporary text element to the SVG container
                 const tempText = theNode
@@ -318,7 +309,7 @@ export const TreeEdit = () => {
                         console.log("found connection to be removed: ", connection);
                     }
                     console.log("removing connection from", selected.id, d.id);
-                    dispatch(setMouseMode(MouseMode.None))
+                    dispatch(setMouseMode(MouseMode.None));
                     dispatch(removeConnection([selected, d]));
                     dispatch(resetSelection());
                 }
@@ -344,7 +335,7 @@ export const TreeEdit = () => {
                         console.log("found connection to be removed: ", connection);
                     }
                     console.log("removing connection from", selected.id, d.id);
-                    dispatch(setMouseMode(MouseMode.None))
+                    dispatch(setMouseMode(MouseMode.None));
                     dispatch(createConnection([selected, d]));
                     dispatch(resetSelection());
                 }
@@ -387,17 +378,18 @@ export const TreeEdit = () => {
                 if (latestEditedTree.current.MouseMode == MouseMode.Create) {
                     dispatch(
                         createFamilyMember({
-                            id: newId,
-                            address: "",
-                            status: "alive",
-                            name: "New member",
-                            deathTime: null,
+                            id: newId.toString(),
+                            userId: user.userData!.id, // here user will be in 100%
+                            name: "New",
+                            surname: "Member",
+                            birthDate: new Date(Date.now()),
+                            deathDate: null,
                         })
                     ).then((d) => {
                         dispatch(
                             createNewNode({
                                 famMemId: (d.payload as FamilyMember).id,
-                                id: newId,
+                                id: newId.toString(),
                                 posX: mouseX - imageSize / 2,
                                 posY: mouseY - imageSize / 2,
                             })
@@ -411,7 +403,7 @@ export const TreeEdit = () => {
                     dispatch(
                         createNewNode({
                             famMemId: null,
-                            id: newId,
+                            id: newId.toString(),
                             posX: mouseX - nodeSize / 2,
                             posY: mouseY - nodeSize / 2,
                         })
@@ -456,9 +448,11 @@ export const TreeEdit = () => {
                     const target = nodesData.find((node) => node.id === d.to);
 
                     if (source && target) {
-                        return `M${source.posX + (source.famMemId ? imageSize / 2 : nodeSize / 2)
-                            },${source.posY + (source.famMemId ? imageSize / 2 : nodeSize / 2)} L${target.posX + (target.famMemId ? imageSize / 2 : nodeSize / 2)
-                            },${target.posY + (target.famMemId ? imageSize / 2 : nodeSize / 2)}`;
+                        return `M${
+                            source.posX + (source.famMemId ? imageSize / 2 : nodeSize / 2)
+                        },${source.posY + (source.famMemId ? imageSize / 2 : nodeSize / 2)} L${
+                            target.posX + (target.famMemId ? imageSize / 2 : nodeSize / 2)
+                        },${target.posY + (target.famMemId ? imageSize / 2 : nodeSize / 2)}`;
                     } else {
                         // Handle cases where source or target is not found
                         return "";
@@ -472,7 +466,7 @@ export const TreeEdit = () => {
                 .select("text")
                 .text((d: any) => {
                     const member = members.find((mem) => mem.id == d.famMemId);
-                    if (member) return member.name;
+                    if (member) return `${member.name} ${member.surname}`;
                     if (d.famMemId) return "name not found";
                     return null;
                 });
@@ -485,8 +479,8 @@ export const TreeEdit = () => {
                             (member) => member.id === d.famMemId
                         );
                         return familyMember
-                            ? familyMember.img_url
-                                ? familyMember.img_url
+                            ? familyMember.imgUrl
+                                ? familyMember.imgUrl
                                 : userImg
                             : "#";
                     }

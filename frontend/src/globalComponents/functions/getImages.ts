@@ -6,7 +6,6 @@ export const getImage = (token: string, url: string) =>
             },
         })
             .then((data) => {
-                console.log(data);
                 data.blob()
                     .then((blb) => res(blb))
                     .catch((err) => {

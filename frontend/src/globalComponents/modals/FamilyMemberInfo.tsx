@@ -30,23 +30,27 @@ export const FamilyMemberInfo = ({ famMember, close }: { famMember: FamilyMember
         setIsEditMode((prev) => {
             if (!prev) return !prev;
             console.log(member);
-            if (member?.status == "dead" && !member?.deathTime) {
+            if (member?.status == "dead" && !member?.deathDate) {
                 member.status = "alive";
             }
             if (member) {
-                dispatch(updateFamilyMemberData({
-                    famMember: member,
-                    image: selectedFile || undefined
-                })).then(() => {
+                dispatch(
+                    updateFamilyMemberData({
+                        famMember: member,
+                        image: selectedFile || undefined,
+                    })
+                ).then(() => {
                     setMember((prev) => {
                         if (prev) {
                             return {
                                 ...prev,
-                                img_url: selectedFile ? URL.createObjectURL(selectedFile) : prev.img_url
-                            }
+                                img_url: selectedFile
+                                    ? URL.createObjectURL(selectedFile)
+                                    : prev.imgUrl,
+                            };
                         }
-                    })
-                })
+                    });
+                });
             }
             return !prev;
         });
@@ -61,7 +65,7 @@ export const FamilyMemberInfo = ({ famMember, close }: { famMember: FamilyMember
         setMember((prev) => {
             return {
                 ...prev,
-                deathTime: e.target.name == "status" ? null : prev?.deathTime,
+                deathTime: e.target.name == "status" ? null : prev?.deathDate,
                 [e.target.name]: e.target.value,
             } as FamilyMember;
         });
@@ -119,8 +123,10 @@ export const FamilyMemberInfo = ({ famMember, close }: { famMember: FamilyMember
                                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                             <DownloadIcon className="w-12 h-12 mb-4" />
                                             <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                                                <span className="font-semibold">Click to upload</span> or
-                                                drag and drop
+                                                <span className="font-semibold">
+                                                    Click to upload
+                                                </span>{" "}
+                                                or drag and drop
                                             </p>
                                             <p className="text-xs text-gray-500 dark:text-gray-400">
                                                 PNG, JPG (PREFERABLY. 800x400px)
@@ -138,26 +144,49 @@ export const FamilyMemberInfo = ({ famMember, close }: { famMember: FamilyMember
                         </>
                     ) : (
                         <figure className="rounded-full overflow-hidden w-1/4 aspect-square flex items-center">
-                            <img src={member.img_url} alt="user image" className="h-full w-full text-center flex justify-center items-center" />
+                            <img
+                                src={member.imgUrl}
+                                alt="user image"
+                                className="h-full w-full text-center flex justify-center items-center"
+                            />
                         </figure>
                     )}
                     <section className="w-3/4 bg-dark-1 rounded-3xl p-3 min-h-[20rem] h-full overflow-y-scroll">
-                        <div className="w-full">
-                            <label className="text-gray-400" htmlFor="name">
-                                Name
-                            </label>
-                            {isEditMode ? (
-                                <div className="">
-                                    <input
-                                        onChange={(e) => handleChange(e)}
-                                        className=""
-                                        name="name"
-                                        value={member.name}
-                                    />
-                                </div>
-                            ) : (
-                                <p className="text-2xl">{member.name}</p>
-                            )}
+                        <div className="w-full flex">
+                            <div>
+                                <label className="text-gray-400" htmlFor="name">
+                                    Name
+                                </label>
+                                {isEditMode ? (
+                                    <div className="">
+                                        <input
+                                            onChange={(e) => handleChange(e)}
+                                            className=""
+                                            name="name"
+                                            value={member.name}
+                                        />
+                                    </div>
+                                ) : (
+                                    <p className="text-2xl">{member.name}</p>
+                                )}
+                            </div>
+                            <div className="ml-5">
+                                <label className="text-gray-400" htmlFor="name">
+                                    Surname
+                                </label>
+                                {isEditMode ? (
+                                    <div className="">
+                                        <input
+                                            onChange={(e) => handleChange(e)}
+                                            className=""
+                                            name="surname"
+                                            value={member.surname}
+                                        />
+                                    </div>
+                                ) : (
+                                    <p className="text-2xl">{member.surname}</p>
+                                )}
+                            </div>
                         </div>
                         <div className="w-full flex mt-2">
                             <div className="w-1/2 ">
@@ -191,16 +220,16 @@ export const FamilyMemberInfo = ({ famMember, close }: { famMember: FamilyMember
                                         {isEditMode ? (
                                             <>
                                                 <label className="text-gray-400" htmlFor="date">
-                                                    Death Time
+                                                    Death Date
                                                 </label>
                                                 <div className="">
                                                     <DatePicker
-                                                        selected={member.deathTime}
+                                                        selected={member.deathDate}
                                                         onChange={(date) =>
                                                             setMember((prev) => {
                                                                 return {
                                                                     ...prev,
-                                                                    deathTime: date || null, // Convert to ISO string or null
+                                                                    deathDate: date || null, // Convert to ISO string or null
                                                                 } as FamilyMember;
                                                             })
                                                         }
@@ -209,16 +238,16 @@ export const FamilyMemberInfo = ({ famMember, close }: { famMember: FamilyMember
                                             </>
                                         ) : (
                                             <>
-                                                {member.deathTime && (
+                                                {member.deathDate && (
                                                     <>
                                                         <label
                                                             className="text-gray-400"
                                                             htmlFor="date"
                                                         >
-                                                            Death Time
+                                                            Death Date
                                                         </label>
                                                         <p className="text-2xl" id="date">
-                                                            {member.deathTime.toLocaleDateString()}
+                                                            {member.deathDate.toLocaleDateString()}
                                                         </p>
                                                     </>
                                                 )}
@@ -229,22 +258,38 @@ export const FamilyMemberInfo = ({ famMember, close }: { famMember: FamilyMember
                             </div>
                         </div>
                         <div className="w-full mt-2">
-                            <label className="text-gray-400" htmlFor="address">
-                                Address
-                            </label>
                             {isEditMode ? (
-                                <div className="">
-                                    <input
-                                        onChange={(e) => handleChange(e)}
-                                        className=""
-                                        name="address"
-                                        value={member.address}
-                                    />
-                                </div>
+                                <>
+                                    <label className="text-gray-400" htmlFor="date">
+                                        Birth Date
+                                    </label>
+                                    <div className="">
+                                        <DatePicker
+                                            selected={member.birthDate}
+                                            onChange={(date) =>
+                                                setMember((prev) => {
+                                                    return {
+                                                        ...prev,
+                                                        birthDate: date || null, // Convert to ISO string or null
+                                                    } as FamilyMember;
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                </>
                             ) : (
-                                <p className="text-2xl" id="address">
-                                    {member.address}
-                                </p>
+                                <>
+                                    {member.birthDate && (
+                                        <>
+                                            <label className="text-gray-400" htmlFor="date">
+                                                Birth Date
+                                            </label>
+                                            <p className="text-2xl" id="date">
+                                                {member.birthDate.toLocaleDateString()}
+                                            </p>
+                                        </>
+                                    )}
+                                </>
                             )}
                         </div>
                         <div className="w-full mt-2">
@@ -281,8 +326,7 @@ export const FamilyMemberInfo = ({ famMember, close }: { famMember: FamilyMember
                         </div>
                     </section>
                 </article>
-            )
-            }
-        </div >
+            )}
+        </div>
     );
 };

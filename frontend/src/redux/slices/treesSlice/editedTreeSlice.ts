@@ -16,43 +16,35 @@ enum status {
     error,
 }
 
-export interface FamilyMember {
-    id: number;
-    name: string;
-    status: string;
-    deathTime: Date | null;
-    address: string;
-    additionalData?: string;
-    img_url?: string;
-}
-
 export interface FamilyMemberToUpdate {
     famMember: FamilyMember;
     image?: File;
 }
 
 export interface FamilyMember {
-    id: number;
+    id: string;
+    userId: string;
+    imgUrl?: string;
     name: string;
-    status: string;
-    deathTime: Date | null;
-    address: string;
+    surname: string;
+    status?: string;
+    birthDate: Date | null;
+    deathDate: Date | null;
     additionalData?: string;
-    img_url?: string;
 }
 
 export interface NodeConnection {
-    id: number;
-    famTreeNumber: number;
-    from: number;
-    to: number;
+    id: string;
+    famTreeNumber: string;
+    from: string;
+    to: string;
 }
 
 export interface Node {
-    id: number;
+    id: string;
     posX: number;
     posY: number;
-    famMemId: number | null;
+    famMemId: string | null;
 }
 
 export enum MouseMode {
