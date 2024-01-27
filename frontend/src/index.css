@@ -1,69 +1,120 @@
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+* {
+    font-family: Inter;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+.no-tap {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+    pointer-events: none;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+.bg-gradient {
+    background: linear-gradient(90deg, #fd7900 -0.88%, #f33 48.31%, #ff00e5 100%);
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+.login-title {
+    @apply text-2xl font-bold;
+}
+
+.login-subtitle {
+    @apply text-justify;
+}
+
+.logo-text {
+    @apply font-island-moment;
+}
+
+.button {
+    @apply rounded-lg border-[1px] px-8 py-2 text-sm;
+}
+.button.orange {
+    @apply border-orange text-orange hover:text-orange-hover hover:border-orange-hover transition-colors duration-100;
+}
+
+.title {
+    @apply text-3xl font-thin;
+}
+
+.title.big {
+    @apply text-6xl;
+}
+
+.register-button {
+    @apply rounded-lg border-[1px] border-error text-error px-11 py-2 hover:text-error-hover hover:border-error-hover transition-colors duration-100;
+}
+.gradient-button:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #ff00e5 0.88%, #f33 48.31%, #fd7900 100%);
+    transition: opacity 0.4s;
+    opacity: 0;
+    z-index: -1;
+}
+.gradient-button:hover::before {
+    opacity: 1;
+}
+.gradient-button {
+    @apply bg-gradient text-gradient-text p-2 mt-4 rounded-3xl relative z-[1] overflow-hidden;
+}
+
+input {
+    @apply p-2 bg-transparent text-default-color rounded-3xl pl-4 border-[1px];
+}
+
+select {
+    @apply py-1 px-3 bg-dark-1 min-w-[15rem] text-center rounded-full border border-default-color appearance-none relative;
+}
+
+.select-wrapper {
+    @apply relative;
+}
+
+.select-wrapper:after {
+    content: "▼";
+    font-size: 1rem;
+    top: 6px;
+    right: 10px;
+    position: absolute;
+}
+
+.select-wrapper:after select:focus {
+    transform: rotate(90);
+}
+
+.header {
+    @apply bg-dark-1 fixed top-0 left-0 text-default-color p-3 w-full flex justify-between items-center;
+}
+
+.popup-content {
+    @apply m-auto bg-dark-3 2xl:w-1/2 xl:w-3/4 p-[5px] py-10 text-default-color;
+}
+.popup-arrow {
+    color: rgb(255, 255, 255);
+}
+[role="tooltip"].popup-content {
+    width: 200px;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 0px 3px;
+}
+.popup-overlay {
+    background: rgba(0, 0, 0, 0.6);
+}
+[data-popup="tooltip"].popup-overlay {
+    background: transparent;
 }

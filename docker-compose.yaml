@@ -1,0 +1,61 @@
+version: "3.8"
+services:
+    # database-server:
+    #     image: postgres
+    # restart: always
+    # environment:
+    #     - POSTGRES_PASSWORD: example
+    # container_name: postgress-server
+    # # ports:
+    # #     - "27017:27017"
+    # volumes:
+    #     # - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    #     # paths for backups and data itself (should be on server preferable disk infrastructure like RAIDs)
+    #     # - /tmp//mongo-db-backup:/backup
+    #     # - /tmp//mongo-db-data:/data/db
+    # command:
+    #     - "--logpath"
+    #     - "/var/log/mongodb/mongod.log"
+    # networks:
+    #     - database
+    backend:
+        build: ./backend
+        container_name: "family-tree-api"
+        restart: always
+        # volumes:
+        # backup of user images
+        # - /tmp/server-images:/backend/uploads
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+            - ASPNETCORE_URLS=http://+:5000
+            - ASPNETCORE_HTTP_PORT=https//+:5001
+        ports:
+            - "5000:5000"
+            - "5001:5001"
+        # links:
+        #     - database-server
+        # depends_on:
+        #     - database-server
+        networks:
+            - backend
+            - database
+    # front:
+    #   build: ./front
+    #   restart: always
+    #   container_name: "harwdare-store-website-server"
+    #   environment:
+    #     - VITE_API_URL=http://hardware-store-api:9999
+    #   ports:
+    #     - "80:80"
+    #   links:
+    #     - back
+    #   depends_on:
+    #     - back
+    #   networks:
+    #     - backend
+
+networks:
+    database:
+        driver: bridge
+    backend:
+        driver: bridge
