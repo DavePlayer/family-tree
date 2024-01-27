@@ -59,15 +59,8 @@ builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddDbContext<FamilyTreeContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("familyTreeContext")));
 builder.Services.AddScoped<ErrorHandlingMiddleware>();
 builder.Services.AddScoped<StaticFileAuthorizationMiddleware>();
-//builder.Services.AddCors(options => {
-//    options.AddPolicy("CorsPolicy", builder =>
-//    {
-//        builder
-//        .AllowAnyHeader()
-//        .AllowAnyOrigin();
-//    });
-//});
 
+builder.Services.AddCors();
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -95,26 +88,17 @@ builder.Services.AddSwaggerGen(options =>
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var app = builder.Build();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(name: MyAllowSpecificOrigins,
-                      policy =>
-                      {
-                          policy.WithOrigins("http://localhost",
-                                              "http://127.0.0.1")
-                                            .AllowAnyHeader()
-                                            .AllowAnyMethod()
-                                            .WithHeaders("GET,PUSH,DELETE,POST");
-                                            
-                      });
-});
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-//app.UseCors("CorsPolicy");
-app.UseCors(MyAllowSpecificOrigins);
+
+app.UseCors(builder => builder
+    .AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader());
 app.UseAuthentication();
 app.UseAuthorization();
 
