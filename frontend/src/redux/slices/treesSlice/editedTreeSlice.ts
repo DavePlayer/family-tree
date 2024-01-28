@@ -7,7 +7,7 @@ import { createFamilyMember } from "./cases/craeteFamilyMember.ts";
 import { createNewNode } from "./cases/createNewNode.ts";
 import { removeNode } from "./cases/RemoveNode.ts";
 import { removeConnection } from "./cases/tests/removeConnection.ts";
-import { createConnection } from "./cases/tests/createConnection.ts";
+import { createConnection } from "./cases/createConnection.ts";
 import { uploadImage } from "../../../globalComponents/functions/uploadImageCase.ts";
 
 enum status {
