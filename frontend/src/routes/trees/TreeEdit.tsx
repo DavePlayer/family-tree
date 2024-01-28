@@ -20,7 +20,7 @@ import { FamilyMemberInfo } from "../../globalComponents/modals/FamilyMemberInfo
 import { createFamilyMember } from "../../redux/slices/treesSlice/cases/craeteFamilyMember.ts";
 import { createNewNode } from "../../redux/slices/treesSlice/cases/createNewNode.ts";
 import { removeNode } from "../../redux/slices/treesSlice/cases/RemoveNode.ts";
-import { removeConnection } from "../../redux/slices/treesSlice/cases/tests/removeConnection.ts";
+import { removeConnection } from "../../redux/slices/treesSlice/cases/removeConnection.ts";
 import { toast } from "react-toastify";
 import { createConnection } from "../../redux/slices/treesSlice/cases/createConnection.ts";
 import { getImage } from "../../globalComponents/functions/getImages.ts";
@@ -340,7 +340,7 @@ export const TreeEdit = () => {
                     }
                     console.log("removing connection from", selected.id, d.id);
                     dispatch(setMouseMode(MouseMode.None));
-                    dispatch(removeConnection([selected, d]));
+                    dispatch(removeConnection({ token: user.jwt, id: connection.id }));
                     dispatch(resetSelection());
                 }
             } else if (latestEditedTree.current.MouseMode == MouseMode.Link) {
@@ -488,8 +488,6 @@ export const TreeEdit = () => {
 
         const updateNodes = () => {
             // Update SVG elements based on simulation state
-            const members = latestEditedTree.current.members;
-
             svg.selectAll(".link")
                 // .lower()
                 .attr("d", (d: any) => {
@@ -507,52 +505,6 @@ export const TreeEdit = () => {
                         return "";
                     }
                 });
-
-            svg.selectAll(".nodes")
-                .attr("x", (d: any) => d.x)
-                .attr("y", (d: any) => d.y)
-                // .raise()
-                .select("text")
-                .text((d: any) => {
-                    const member = members.find((mem) => mem.id == d.famMemId);
-                    if (member) return `${member.name} ${member.surname}`;
-                    if (d.famMemId) return "name not found";
-                    return null;
-                });
-            // svg.selectAll(".nodes")
-            //     .select("image")
-            //     // @ts-ignore
-            //     .each(function (d: Node) {
-            //         const image = d3.select(this);
-
-            //         if (d.famMemId) {
-            //             const [familyMember] = latestEditedTree.current.members.filter(
-            //                 (member) => member.id === d.famMemId
-            //             );
-            //             if (familyMember && familyMember.imgUrl) {
-            //                 // Fetch the image using your getImage function
-            //                 getImage(user.jwt, familyMember.imgUrl)
-            //                     .then((blob) => {
-            //                         // Convert the Blob to a data URL
-            //                         const imageUrl = URL.createObjectURL(blob);
-
-            //                         // Set the xlink:href attribute with the fetched image URL
-            //                         image.attr("xlink:href", imageUrl);
-            //                     })
-            //                     .catch((error) => {
-            //                         console.error(error);
-            //                         image.attr("xlink:href", userImg);
-            //                         console.log("ERROR IN GETING MEMBER IMAGE");
-            //                     });
-            //             } else {
-            //                 // Set a default image if no family member or image URL is available
-            //                 image.attr("xlink:href", userImg);
-            //             }
-            //         } else {
-            //             // Set a default image for nodes without a family member
-            //             image.attr("xlink:href", "#");
-            //         }
-            //     });
         };
         simulation.on("tick", updateNodes);
 
@@ -570,6 +522,59 @@ export const TreeEdit = () => {
             simulation.stop();
         };
     }, [editedTree]);
+
+    useEffect(() => {
+        const svg = d3.select(mapRef.current);
+
+        const members = latestEditedTree.current.members;
+
+        svg.selectAll(".nodes")
+            .attr("x", (d: any) => d.x)
+            .attr("y", (d: any) => d.y)
+            // .raise()
+            .select("text")
+            .text((d: any) => {
+                const member = members.find((mem) => mem.id == d.famMemId);
+                if (member) return `${member.name} ${member.surname}`;
+                if (d.famMemId) return "name not found";
+                return null;
+            });
+
+        svg.selectAll(".nodes")
+            .select("image")
+            // @ts-ignore
+            .each(function (d: Node) {
+                const image = d3.select(this);
+
+                if (d.famMemId) {
+                    const [familyMember] = latestEditedTree.current.members.filter(
+                        (member) => member.id === d.famMemId
+                    );
+                    if (familyMember && familyMember.imgUrl) {
+                        // Fetch the image using your getImage function
+                        getImage(user.jwt, familyMember.imgUrl)
+                            .then((blob) => {
+                                // Convert the Blob to a data URL
+                                const imageUrl = URL.createObjectURL(blob);
+
+                                // Set the xlink:href attribute with the fetched image URL
+                                image.attr("xlink:href", imageUrl);
+                            })
+                            .catch((error) => {
+                                console.error(error);
+                                image.attr("xlink:href", userImg);
+                                console.log("ERROR IN GETING MEMBER IMAGE");
+                            });
+                    } else {
+                        // Set a default image if no family member or image URL is available
+                        image.attr("xlink:href", userImg);
+                    }
+                } else {
+                    // Set a default image for nodes without a family member
+                    image.attr("xlink:href", "#");
+                }
+            });
+    }, [latestEditedTree.current]);
     return (
         <>
             <main className="w-full flex h-[100vh] bg-mainBg text-default-color">

@@ -6,7 +6,7 @@ import { updateFamilyMemberData } from "./cases/updateFamilyMemberData.ts";
 import { createFamilyMember } from "./cases/craeteFamilyMember.ts";
 import { createNewNode } from "./cases/createNewNode.ts";
 import { removeNode } from "./cases/RemoveNode.ts";
-import { removeConnection } from "./cases/tests/removeConnection.ts";
+import { removeConnection } from "./cases/removeConnection.ts";
 import { createConnection } from "./cases/createConnection.ts";
 import { uploadImage } from "../../../globalComponents/functions/uploadImageCase.ts";
 
@@ -366,13 +366,7 @@ export const treesSlice = createSlice({
                     autoClose: 2000,
                 });
             const [node1, node2] = action.payload;
-            const newConnections = state.connections.filter(
-                (o) =>
-                    !(
-                        (o.from === node1.id && o.to === node2.id) ||
-                        (o.from === node2.id && o.to === node1.id)
-                    )
-            );
+            const newConnections = state.connections.filter((o) => o.id != action.payload);
             const newNodes = state.nodes.map((o) => {
                 return {
                     ...o,
@@ -449,8 +443,7 @@ export const treesSlice = createSlice({
             state.tempImageAddr = `${import.meta.env.VITE_API_URL}/assets/${action.payload}`;
         });
         builder.addCase(uploadImage.rejected, (state, payload) => {
-            toast.update(`imageUpload`, {
-                render: "failed to upload image",
+            toast.error("failed to upload image", {
                 type: "error",
                 isLoading: false,
                 autoClose: 2000,
