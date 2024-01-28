@@ -60,10 +60,10 @@ namespace family_tree_API.Services
             FamilyMember? to = _context.FamilyMembers.Where(m => (m.Id == nodeToId.FamilyMember && m.UserId.ToString() == userId)).FirstOrDefault();
             FamilyMember? from = _context.FamilyMembers.Where(m => (m.Id == nodeFromId.FamilyMember && m.UserId.ToString() == userId)).FirstOrDefault();
 
-            if (to == null || from == null)
-            {
-                throw new BadRequestException("One or both family members does not belong to this user", new Exception());
-            }
+            //if (to == null || from == null)
+            //{
+            //    throw new BadRequestException("One or both family members does not belong to this user", new Exception());
+            //}
 
             Connection connection = new Connection()
             {
