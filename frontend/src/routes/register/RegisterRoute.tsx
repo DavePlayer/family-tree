@@ -76,7 +76,7 @@ export const RegisterRoute = () => {
 
     return (
         <main className="flex h-[100vh] bg-mainBg justify-center">
-            <section className="w-1/2 flex justify-center items-center text-default-color">
+            <section className="2xl:w-1/2 w-3/4 flex justify-center items-center text-default-color">
                 <article className="flex flex-col w-1/2">
                     <Logo />
                     <form action="#" className="w-full">

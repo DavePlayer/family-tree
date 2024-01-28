@@ -119,6 +119,9 @@ export const TreeEdit = () => {
                         //     })
                         //     .style("fill", "#FD7900");
                     }, 300);
+                })
+                .catch((err) => {
+                    toast.error(err);
                 });
         }, 3000);
     };

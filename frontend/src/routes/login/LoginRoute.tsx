@@ -74,7 +74,7 @@ export const LoginRoute = () => {
                 <GradientText />
             </section>
             <section className="w-1/2 flex justify-center items-center text-default-color">
-                <article className="flex flex-col w-1/2">
+                <article className="flex flex-col 2xl:w-1/2 w-3/4 ">
                     <Logo />
                     <form action="#" className="w-full">
                         <p className="mt-10 mb-5 text-lg">Please login to your account</p>
@@ -102,7 +102,7 @@ export const LoginRoute = () => {
                             Login
                         </button>
                     </form>
-                    <div className="w-full flex justify-between mt-[8rem] items-center">
+                    <div className="w-full flex justify-between 2xl:mt-[8rem] mt-[4rem] items-center">
                         <p>Don't have an account?</p>
                         <button onClick={() => navigate("/register")} className="register-button">
                             Register
