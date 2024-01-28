@@ -4,6 +4,9 @@ import { RootState, useAppDispatch } from "../../redux/store";
 import { fetchEditerTreeData } from "../../redux/slices/treesSlice/cases/fetchEditTreeData";
 import { useEffect, useRef, useState } from "react";
 import userImg from "../../assets/user_image.png";
+import userImgBlack from "../../assets/user_image_black.png";
+import ResetZoomIcon from "./../../assets/resetZoom.svg?react";
+import ExportToPdfIcon from "./../../assets/exportPDF.svg?react";
 import * as d3 from "d3";
 import { useContainerDimensions } from "../../globalHooks/useContainerDimensions.ts";
 import {
@@ -24,6 +27,8 @@ import { removeConnection } from "../../redux/slices/treesSlice/cases/removeConn
 import { toast } from "react-toastify";
 import { createConnection } from "../../redux/slices/treesSlice/cases/createConnection.ts";
 import { getImage } from "../../globalComponents/functions/getImages.ts";
+import { jsPDF } from "jspdf";
+import "svg2pdf.js";
 
 export const TreeEdit = () => {
     const params = useParams();
@@ -34,6 +39,89 @@ export const TreeEdit = () => {
     const latestEditedTree = useRef<EditedTree>(editedTree);
     const mapRef = useRef(null);
     const { width: famTreeWidth, height: famTreeHeight } = useContainerDimensions(mapRef);
+
+    const exportToPdf = () => {
+        const doc = new jsPDF({
+            orientation: "landscape",
+        });
+
+        let element: any = mapRef.current;
+
+        const svg = d3.select(mapRef.current);
+        svg.selectAll(".link").style("stroke", "#000").style("fill", "#000");
+        svg.selectAll("rect").style(`fill`, "#000");
+        svg.selectAll("image").each(function (d: any) {
+            const image = d3.select(this);
+
+            if (d.famMemId) {
+                const [familyMember] = latestEditedTree.current.members.filter(
+                    (member) => member.id === d.famMemId
+                );
+                if (familyMember && familyMember.imgUrl == null) {
+                    image.attr("xlink:href", userImgBlack);
+                }
+            }
+        });
+        svg.selectAll(".label")
+            .attr("fill-opacity", "1")
+            .text(function (d: any) {
+                const member = latestEditedTree.current.members.find(
+                    (mem) => mem.id === d.famMemId
+                );
+                const titleToDisplay = d.famMemId ? `${member?.name} ${member?.surname}` || "" : "";
+
+                return titleToDisplay;
+            })
+            .style("fill", "#000");
+
+        toast.info("Changed colors for PDF export. All will be back in a few seconds");
+        setTimeout(() => {
+            doc.svg(element, {
+                // width: screen.width,
+                // height: screen.height,
+            })
+                .then(() => {
+                    doc.save("myPDF.pdf");
+                })
+                .then(() => {
+                    setTimeout(() => {
+                        window.location.reload();
+                        // svg.selectAll(".link").style("stroke", "#fff").style("fill", "#fff");
+
+                        // svg.selectAll("rect")
+                        //     .style("stroke-width", (d: any) => (d.famMemId ? 1 : 0.6))
+                        //     .style(`fill`, (d: any) => (d.famMemId ? `#292929` : "#fff"))
+                        //     .attr("opacity", (d: any) => (d.famMemId != null ? "0" : "1"));
+
+                        // svg.selectAll("image").each(function (d: any) {
+                        //     const image = d3.select(this);
+
+                        //     if (d.famMemId) {
+                        //         const [familyMember] = latestEditedTree.current.members.filter(
+                        //             (member) => member.id === d.famMemId
+                        //         );
+                        //         if (familyMember && familyMember.imgUrl == null) {
+                        //             image.attr("xlink:href", userImg);
+                        //         }
+                        //     }
+                        // });
+                        // svg.selectAll(".label")
+                        //     .attr("fill-opacity", "0")
+                        //     .text(function (d: any) {
+                        //         const member = latestEditedTree.current.members.find(
+                        //             (mem) => mem.id === d.famMemId
+                        //         );
+                        //         const titleToDisplay = d.famMemId
+                        //             ? `${member?.name} ${member?.surname}` || ""
+                        //             : "";
+
+                        //         return titleToDisplay;
+                        //     })
+                        //     .style("fill", "#FD7900");
+                    }, 300);
+                });
+        }, 3000);
+    };
 
     useEffect(() => {
         dispatch(fetchEditerTreeData({ treeId: params.id || "-1", token: user.jwt }));
@@ -218,6 +306,9 @@ export const TreeEdit = () => {
 
                 return titleToDisplay;
             })
+            .style("fill", function (d) {
+                return d.selected ? "#fff" : "#FD7900";
+            })
             .attr("font-size", `${labelSize}px`)
             .attr("fill-opacity", "0")
             .attr("text-anchor", "middle")
@@ -244,9 +335,6 @@ export const TreeEdit = () => {
                 const offset = Math.round(imageSize / 2) - textWidth / 2;
 
                 return "translate(" + (d.x + offset) + "," + (d.y + imageSize + labelSize) + ")";
-            })
-            .style("fill", function (d) {
-                return d.selected ? "#fff" : "#FD7900";
             });
 
         function nodeMouseover(this: any, _: any, d: Node) {
@@ -574,6 +662,16 @@ export const TreeEdit = () => {
                     image.attr("xlink:href", "#");
                 }
             });
+        svg.selectAll(".label").style("fill", (d: any) => {
+            return d.selected ? "#4dc1ff" : "#FD7900";
+        });
+        svg.selectAll(".nodes").each(function (d: any) {
+            const node = d3.select(this);
+            node.select("rect").style(`fill`, () => {
+                console.log(d);
+                return d.famMemId ? "#292929" : d.selected ? "#4dc1ff" : "#fff";
+            });
+        });
     }, [latestEditedTree.current]);
     return (
         <>
@@ -586,21 +684,19 @@ export const TreeEdit = () => {
                     >
                         <g className="plot-area" />
                     </svg>
-                    <button id="resetButton" className="button fixed left-0 bottom-0">
-                        reset position
-                    </button>
+                    <ResetZoomIcon
+                        id="resetButton"
+                        className="fill-default-color fixed left-5 bottom-5 scale-125 cursor-pointer"
+                    />
+                    <ExportToPdfIcon
+                        onClick={() => exportToPdf()}
+                        id="resetButton"
+                        className="fill-default-color fixed left-[60px] bottom-5 scale-125 cursor-pointer"
+                    />
                 </div>
             </main>
             <Popup
                 open={selectedFamMamber !== null}
-                // trigger={
-                //     <button
-                //         onClick={() => setPopupOpen(true)}
-                //         className="button orange absolute right-10 bottom-1/2 translate-y-1/2"
-                //     >
-                //         CREATE NEW TREE
-                //     </button>
-                // }
                 onClose={() => {
                     setSelectedFamMember(null);
                 }}
