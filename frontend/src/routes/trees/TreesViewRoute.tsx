@@ -43,13 +43,15 @@ export const TreesViewRoute = () => {
                     }
                 </Popup>
             </div>
-            <section className="flex flex-wrap gap-8 px-8 pt-16">
+            <section className="grid grid-cols-5 gap-8 px-20 pt-16 justify-items-center max-h-[70vh] overflow-y-scroll">
                 {trees.length > 0 ? (
                     trees.map((tree) => {
-                        return <TreeView tree={tree} />;
+                        return <TreeView key={tree.id} tree={tree} />;
                     })
                 ) : (
-                    <h3 className="title text-center mt-16">there are no trees right now :(</h3>
+                    <h3 className="title text-center mt-16 w-full col-span-5">
+                        there are no trees right now :(
+                    </h3>
                 )}
             </section>
         </main>

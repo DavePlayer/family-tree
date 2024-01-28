@@ -12,6 +12,7 @@ import { store } from "./redux/store.ts";
 import { TreeEdit } from "./routes/trees/TreeEdit.tsx";
 import { ToolHeader } from "./globalComponents/ToolHeader.tsx";
 import { Protector } from "./globalComponents/Protector.tsx";
+import { RegisterRoute } from "./routes/register/RegisterRoute.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
@@ -19,7 +20,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<App />} />
-                    <Route path="/register" element={<h1>register</h1>} />
+                    <Route path="/register" element={<RegisterRoute />} />
                     <Route path="/login" element={<LoginRoute />} />
                     <Route element={<Protector />}>
                         <Route element={<Header />}>

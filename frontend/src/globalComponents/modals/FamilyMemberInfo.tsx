@@ -11,6 +11,7 @@ import { AppDispatch, RootState } from "../../redux/store.ts";
 import { updateFamilyMemberData } from "../../redux/slices/treesSlice/cases/updateFamilyMemberData.ts";
 import { getImage } from "../functions/getImages.ts";
 import { uploadImage } from "../functions/uploadImageCase.ts";
+import { toast } from "react-toastify";
 
 export const FamilyMemberInfo = ({ famMember, close }: { famMember: FamilyMember; close: any }) => {
     const [member, setMember] = useState<FamilyMember>();
@@ -18,10 +19,37 @@ export const FamilyMemberInfo = ({ famMember, close }: { famMember: FamilyMember
     const dispatch = useDispatch<AppDispatch>();
     const user = useSelector((root: RootState) => root.user);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [photoChanged, setPhotoChanged] = useState(false);
 
     const handleFile = (file: File) => {
         if (file.type == "image/png" || file.type == "image/jpeg" || file.type == "image/jpg") {
-            setSelectedFile(file);
+            let image = new Image();
+
+            image.onload = () => {
+                const width = image.width;
+                const height = image.height;
+
+                console.log("Image width:", width);
+                console.log("Image height:", height);
+
+                const targetAspectRatio = 1;
+
+                const actualAspectRatio = height / width;
+
+                const tolerance = 0.1;
+
+                if (
+                    actualAspectRatio >= targetAspectRatio - tolerance &&
+                    actualAspectRatio <= targetAspectRatio + tolerance
+                ) {
+                    setSelectedFile(file);
+                    setPhotoChanged(true);
+                } else {
+                    toast.error("image must be square");
+                }
+            };
+
+            image.src = URL.createObjectURL(file);
         }
     };
 
@@ -41,7 +69,7 @@ export const FamilyMemberInfo = ({ famMember, close }: { famMember: FamilyMember
                 member.status = "alive";
             }
             if (member) {
-                if (selectedFile) {
+                if (selectedFile && photoChanged) {
                     dispatch(uploadImage({ file: selectedFile, token: user.jwt })).then((a) => {
                         console.log("SENT PHOTO> NOW UPDATEING IMAGE: ", a.payload);
                         dispatch(
@@ -71,7 +99,7 @@ export const FamilyMemberInfo = ({ famMember, close }: { famMember: FamilyMember
                                 birthDate: member.birthDate,
                                 deathDate: member.deathDate,
                                 id: member.id,
-                                imgUrl: null,
+                                imgUrl: member.imgUrl ? member.imgUrl : null,
                                 name: member.name,
                                 surname: member.surname,
                                 status: member.status,

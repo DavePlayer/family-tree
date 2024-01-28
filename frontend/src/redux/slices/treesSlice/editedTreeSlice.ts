@@ -140,7 +140,6 @@ export const treesSlice = createSlice({
         });
         builder.addCase(fetchEditerTreeData.fulfilled, (state, action) => {
             // add selected property to every node
-            console.log(action.payload);
             const oldNodes = action.payload.nodes;
             const newNodes = oldNodes.map((o: NodeNotParsed) => {
                 return {
@@ -177,7 +176,7 @@ export const treesSlice = createSlice({
 
             return newState;
         });
-        builder.addCase(fetchEditerTreeData.rejected, (state, payload) => {
+        builder.addCase(fetchEditerTreeData.rejected, (state) => {
             if (state && state.toastId)
                 toast.update(state.toastId, {
                     render: "failed to get given tree",
@@ -185,7 +184,6 @@ export const treesSlice = createSlice({
                     isLoading: false,
                     autoClose: 2000,
                 });
-            console.error(`${payload.error.code}: ${payload.error.message}`);
         });
 
         // ---------------------
@@ -223,7 +221,7 @@ export const treesSlice = createSlice({
                 ],
             };
         });
-        builder.addCase(updateFamilyMemberData.rejected, (state, payload) => {
+        builder.addCase(updateFamilyMemberData.rejected, (state) => {
             if (state && state.toastId)
                 toast.update(state.toastId, {
                     render: "failed to update member",
@@ -231,7 +229,6 @@ export const treesSlice = createSlice({
                     isLoading: false,
                     autoClose: 2000,
                 });
-            console.error(`${payload.error.code}: ${payload.error.message}`);
         });
 
         // ---------------------
@@ -257,7 +254,7 @@ export const treesSlice = createSlice({
             action.payload.birthDate = new Date(action.payload.birthDate);
             return { ...state, members: [...state.members, action.payload] };
         });
-        builder.addCase(createFamilyMember.rejected, (state, payload) => {
+        builder.addCase(createFamilyMember.rejected, (state) => {
             if (state && state.toastId)
                 toast.update(state.toastId, {
                     render: "failed to create member",
@@ -265,7 +262,6 @@ export const treesSlice = createSlice({
                     isLoading: false,
                     autoClose: 2000,
                 });
-            console.error(`${payload.error.code}: ${payload.error.message}`);
         });
 
         // ---------------------
@@ -295,7 +291,7 @@ export const treesSlice = createSlice({
             };
             return { ...state, nodes: [...state.nodes, newNode] };
         });
-        builder.addCase(createNewNode.rejected, (state, payload) => {
+        builder.addCase(createNewNode.rejected, (state) => {
             if (state && state.toastId)
                 toast.update(state.toastId, {
                     render: "failed to create new node",
@@ -303,7 +299,6 @@ export const treesSlice = createSlice({
                     isLoading: false,
                     autoClose: 2000,
                 });
-            console.error(`${payload.error.code}: ${payload.error.message}`);
         });
 
         // ---------------------
@@ -341,7 +336,6 @@ export const treesSlice = createSlice({
                     isLoading: false,
                     autoClose: 2000,
                 });
-            console.error(`${payload.error.code}: ${payload.error.message}`, payload.error);
         });
 
         // ---------------------
@@ -376,7 +370,7 @@ export const treesSlice = createSlice({
             });
             return { ...state, connections: newConnections, nodes: newNodes };
         });
-        builder.addCase(removeConnection.rejected, (state, payload) => {
+        builder.addCase(removeConnection.rejected, (state) => {
             if (state && state.toastId)
                 toast.update(state.toastId, {
                     render: "failed to remove connection",
@@ -384,7 +378,6 @@ export const treesSlice = createSlice({
                     isLoading: false,
                     autoClose: 2000,
                 });
-            console.error(`${payload.error.code}: ${payload.error.message}`);
         });
 
         // ---------------------
@@ -421,7 +414,7 @@ export const treesSlice = createSlice({
                 MouseMode: MouseMode.None,
             };
         });
-        builder.addCase(createConnection.rejected, (state, payload) => {
+        builder.addCase(createConnection.rejected, (state) => {
             if (state && state.toastId)
                 toast.update(state.toastId, {
                     render: "failed to create connection",
@@ -429,7 +422,6 @@ export const treesSlice = createSlice({
                     isLoading: false,
                     autoClose: 2000,
                 });
-            console.error(`${payload.error.code}: ${payload.error.message}`);
         });
 
         // ---------------------
@@ -442,13 +434,12 @@ export const treesSlice = createSlice({
             state.status = status.loaded;
             state.tempImageAddr = `${import.meta.env.VITE_API_URL}/assets/${action.payload}`;
         });
-        builder.addCase(uploadImage.rejected, (state, payload) => {
+        builder.addCase(uploadImage.rejected, () => {
             toast.error("failed to upload image", {
                 type: "error",
                 isLoading: false,
                 autoClose: 2000,
             });
-            console.error(`${payload.error.code}: ${payload.error.message}`);
         });
     },
 });

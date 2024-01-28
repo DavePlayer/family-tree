@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { loginUser } from "./cases/login.ts";
 import { Id, toast } from "react-toastify";
 import { validateJwt } from "./cases/verifyToken.ts";
+import { registerUser } from "./cases/register.ts";
 
 export interface TokenData {
     "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier": string;
@@ -28,6 +29,10 @@ const userSlice = createSlice({
         // incrementByAmount: (state, action: PayloadAction<number>) => {
         //     state.value += action.payload;
         // },
+        logout: () => {
+            localStorage.removeItem("JWTtoken");
+            return initialState;
+        },
     },
     extraReducers: (builder) => {
         // ---------------------
@@ -35,7 +40,7 @@ const userSlice = createSlice({
         // ---------------------
         builder.addCase(loginUser.pending, (state, action) => {
             // toast.dismiss(state.toastId);
-            state.toastId = toast.loading("loging in", {
+            state.toastId = toast.loading("logging in", {
                 autoClose: 5000,
                 closeButton: true,
                 closeOnClick: true,
@@ -45,7 +50,7 @@ const userSlice = createSlice({
         builder.addCase(loginUser.fulfilled, (state, action) => {
             if (state.toastId)
                 toast.update(`login${action.meta.requestId}`, {
-                    render: "loged in successfully",
+                    render: "logged in successfully",
                     type: "success",
                     isLoading: false,
                     autoClose: 2000,
@@ -69,7 +74,38 @@ const userSlice = createSlice({
         builder.addCase(loginUser.rejected, (state, payload) => {
             if (state && state.toastId)
                 toast.update(`login${payload.meta.requestId}`, {
-                    render: "failed loging in",
+                    render: "failed to logg in",
+                    type: "error",
+                    isLoading: false,
+                    autoClose: 2000,
+                });
+            console.error(`${payload.error.code}: ${payload.error.message}`);
+        });
+
+        // ---------------------
+        // register User
+        // ---------------------
+        builder.addCase(registerUser.pending, (state, action) => {
+            state.toastId = toast.loading("registering new user", {
+                autoClose: 5000,
+                closeButton: true,
+                closeOnClick: true,
+                toastId: `register${action.meta.requestId}`,
+            });
+        });
+        builder.addCase(registerUser.fulfilled, (state, action) => {
+            if (state.toastId)
+                toast.update(`register${action.meta.requestId}`, {
+                    render: "registered new user successfully",
+                    type: "success",
+                    isLoading: false,
+                    autoClose: 2000,
+                });
+        });
+        builder.addCase(registerUser.rejected, (state, payload) => {
+            if (state && state.toastId)
+                toast.update(`register${payload.meta.requestId}`, {
+                    render: "failed to register user",
                     type: "error",
                     isLoading: false,
                     autoClose: 2000,
@@ -110,4 +146,5 @@ const userSlice = createSlice({
     },
 });
 
+export const { logout } = userSlice.actions;
 export default userSlice.reducer;

@@ -14,7 +14,39 @@ export const CreateNewTree: React.FC<{ close: () => void }> = ({ close }) => {
     const userData = useSelector((root: RootState) => root.user);
     const handleFile = (file: File) => {
         if (file.type == "image/png" || file.type == "image/jpeg" || file.type == "image/jpg") {
-            setSelectedFile(file);
+            let image = new Image();
+
+            image.onload = () => {
+                const width = image.width;
+                const height = image.height;
+
+                console.log("Image width:", width);
+                console.log("Image height:", height);
+
+                // Define the target aspect ratio (3:4)
+                const targetAspectRatio = 1 / 2;
+
+                // Calculate the actual aspect ratio
+                const actualAspectRatio = height / width;
+
+                // Define a tolerance level for acceptable aspect ratios
+                const tolerance = 0.1; // You can adjust this value based on your requirements
+
+                // Check if the aspect ratio is within the acceptable range
+                if (
+                    actualAspectRatio >= targetAspectRatio - tolerance &&
+                    actualAspectRatio <= targetAspectRatio + tolerance
+                ) {
+                    // Aspect ratio is valid, you can proceed with the selected file
+                    setSelectedFile(file);
+                } else {
+                    // Display an error message or handle the aspect ratio mismatch
+                    toast.error("image ratio must be 1/2");
+                    // You can also reset the selected file or take other appropriate actions.
+                }
+            };
+
+            image.src = URL.createObjectURL(file);
         }
     };
     const handleForm = (e: React.ChangeEvent<HTMLInputElement>) => {

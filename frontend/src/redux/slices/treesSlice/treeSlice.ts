@@ -3,6 +3,7 @@ import { Id, toast } from "react-toastify";
 import { fetchTrees } from "./cases/fetchTrees.ts";
 import { createNewTree } from "./cases/tests/createNewTree.ts";
 import { uploadImage } from "../../../globalComponents/functions/uploadImageCase.ts";
+import { removeTree } from "./cases/removeTree.ts";
 
 // Define a type for the slice state
 export interface Tree {
@@ -56,30 +57,28 @@ export const treesSlice = createSlice({
             state.status = status.loaded;
             if (state.toastId)
                 toast.update(state.toastId, {
-                    render: "fetched trees",
+                    render: "fetched trees successfully",
                     type: "success",
                     isLoading: false,
                     autoClose: 2000,
                 });
             state.familyTrees = action.payload;
         });
-        builder.addCase(fetchTrees.rejected, (state, payload) => {
+        builder.addCase(fetchTrees.rejected, (state) => {
             if (state.toastId)
                 toast.update(state.toastId, {
-                    render: "failed to get trees",
+                    render: "failed to fetch trees",
                     type: "error",
                     isLoading: false,
                     autoClose: 2000,
                 });
-            console.error(`${payload.error.code}: ${payload.error.message}`);
         });
 
         // ---------------------
         // Create new Tree
         // ---------------------
         builder.addCase(createNewTree.pending, (state) => {
-            console.log("pending trees from thunk");
-            state.toastId = toast.loading("fetching family trees", {
+            state.toastId = toast.loading("creating new tree", {
                 autoClose: 5000,
                 closeButton: true,
                 closeOnClick: true,
@@ -91,17 +90,51 @@ export const treesSlice = createSlice({
             state.status = status.loaded;
             if (state.toastId)
                 toast.update(state.toastId, {
-                    render: "createdNewTree",
+                    render: "created new tree",
                     type: "success",
                     isLoading: false,
                     autoClose: 2000,
                 });
             state.familyTrees = [...state.familyTrees, action.payload];
         });
-        builder.addCase(createNewTree.rejected, (state, payload) => {
+        builder.addCase(createNewTree.rejected, (state) => {
             if (state.toastId)
                 toast.update(state.toastId, {
                     render: "failed to craete new tree",
+                    type: "error",
+                    isLoading: false,
+                    autoClose: 2000,
+                });
+        });
+
+        // ---------------------
+        // Remove new Tree
+        // ---------------------
+        builder.addCase(removeTree.pending, (state, payload) => {
+            state.toastId = toast.loading("deleting tree", {
+                autoClose: 5000,
+                closeButton: true,
+                closeOnClick: true,
+                toastId: `rmTree${payload.meta.requestId}`,
+            });
+            state.status = status.loading;
+        });
+        builder.addCase(removeTree.fulfilled, (state, action) => {
+            state.status = status.loaded;
+            const newTrees = state.familyTrees.filter((d) => d.id != action.payload);
+            if (state.toastId)
+                toast.update(`rmTree${action.meta.requestId}`, {
+                    render: "removed tree successfully",
+                    type: "success",
+                    isLoading: false,
+                    autoClose: 2000,
+                });
+            state.familyTrees = newTrees;
+        });
+        builder.addCase(removeTree.rejected, (state, payload) => {
+            if (state.toastId)
+                toast.update(`rmTree${payload.meta.requestId}`, {
+                    render: "failed to remove tree",
                     type: "error",
                     isLoading: false,
                     autoClose: 2000,
@@ -119,14 +152,13 @@ export const treesSlice = createSlice({
             state.status = status.loaded;
             state.tempImageAddr = `${import.meta.env.VITE_API_URL}/assets/${action.payload}`;
         });
-        builder.addCase(uploadImage.rejected, (state, payload) => {
-            toast.update(`imageUpload`, {
+        builder.addCase(uploadImage.rejected, () => {
+            toast.update(`imageUploadCreateTree`, {
                 render: "failed to upload image",
                 type: "error",
                 isLoading: false,
                 autoClose: 2000,
             });
-            console.error(`${payload.error.code}: ${payload.error.message}`);
         });
     },
 });
