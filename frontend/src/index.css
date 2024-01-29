@@ -103,7 +103,7 @@ select {
 }
 
 .popup-content {
-    @apply m-auto bg-dark-3 2xl:w-1/2 xl:w-3/4 p-[5px] py-10 text-default-color;
+    @apply m-auto bg-dark-3 2xl:w-1/2 xl:w-3/4 p-[5px] py-10 text-default-color rounded-lg;
 }
 .popup-arrow {
     color: rgb(255, 255, 255);

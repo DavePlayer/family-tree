@@ -9,11 +9,14 @@ import { loginUser } from "../../redux/slices/userSlices/cases/login.ts";
 import { useDispatch } from "react-redux";
 import { validateJwt } from "../../redux/slices/userSlices/cases/verifyToken.ts";
 import { registerUser } from "../../redux/slices/userSlices/cases/register.ts";
+import Popup from "reactjs-popup";
+import { Eula } from "../../globalComponents/modals/Eula.tsx";
 
 export const RegisterRoute = () => {
     const [loginData, setLoginData] = useState({ email: "", password: "", name: "" });
     const [emailError, setEmailError] = useState("");
     const [passError, setPasssError] = useState("");
+    const [openEula, setOpenEula] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
 
@@ -114,6 +117,16 @@ export const RegisterRoute = () => {
                         <button onClick={(e) => handleSubmit(e)} className="w-full gradient-button">
                             Register
                         </button>
+                        <p className="pt-4 text-center">
+                            By clicking Register, you agree to our{" "}
+                            <a
+                                className="text-cyan-400"
+                                onClick={() => setOpenEula((prev) => !prev)}
+                            >
+                                Terms
+                            </a>
+                            .
+                        </p>
                     </form>
                     {/* <div className="w-full flex justify-between mt-[3rem] items-center">
                         <p>Forgot that you</p>
@@ -121,6 +134,18 @@ export const RegisterRoute = () => {
                             Register
                         </button>
                     </div> */}
+                    <Popup open={openEula} modal nested>
+                        {
+                            // It looks like there is a line to allow it but it is commented out
+                            // I'm assuming it was difficult to type properly and the library author gave up.
+                            // @ts-ignore
+                            (close) => (
+                                <>
+                                    <Eula close={() => setOpenEula(false)} />
+                                </>
+                            )
+                        }
+                    </Popup>
                 </article>
             </section>
         </main>

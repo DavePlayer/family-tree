@@ -63,7 +63,7 @@ export const ToolHeader = () => {
                                 editedTree.MouseMode == MouseMode.Delete
                                     ? "fill-orange"
                                     : "fill-secondary-color"
-                            }`}
+                            } min-w-[24px]`}
                         />
                     </div>
                     <div
