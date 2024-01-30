@@ -18,7 +18,7 @@ export const TreeView: React.FC<{ tree: Tree }> = ({ tree }) => {
         <div className="w-full relative">
             <Link key={tree.id} to={`/trees/${tree.id}`} className="w-full">
                 <article key={tree.id} className="w-full rounded-3xl overflow-hidden">
-                    <figure className="h-[10rem] overflow-hidden rounded-3xl grid content-center">
+                    <figure className="overflow-hidden rounded-3xl grid content-center">
                         <img
                             src={image ? URL.createObjectURL(image) : ""}
                             alt="background"

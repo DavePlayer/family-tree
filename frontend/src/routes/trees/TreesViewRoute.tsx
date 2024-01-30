@@ -43,7 +43,7 @@ export const TreesViewRoute = () => {
                     }
                 </Popup>
             </div>
-            <section className="grid grid-cols-5 gap-8 px-20 pt-16 justify-items-center max-h-[70vh] overflow-y-scroll">
+            <section className="grid 2xl:grid-cols-5 grid-cols-4 gap-8 px-20 pt-16 justify-items-center max-h-[70vh] overflow-y-scroll">
                 {trees.length > 0 ? (
                     trees.map((tree) => {
                         return <TreeView key={tree.id} tree={tree} />;

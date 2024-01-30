@@ -16,6 +16,7 @@ export const RegisterRoute = () => {
     const [loginData, setLoginData] = useState({ email: "", password: "", name: "" });
     const [emailError, setEmailError] = useState("");
     const [passError, setPasssError] = useState("");
+    const [nameError, setNameError] = useState("");
     const [openEula, setOpenEula] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
@@ -61,10 +62,10 @@ export const RegisterRoute = () => {
     const handleName = () => {
         const { name } = loginData;
         if (name.length === 0) {
-            setPasssError("name too short");
+            setNameError("name too short");
             return false;
         }
-        setPasssError("");
+        setNameError("");
         return true;
     };
 
@@ -104,7 +105,7 @@ export const RegisterRoute = () => {
                             onChange={(e) => handleForm(e)}
                             onBlur={() => handlePassword()}
                         />
-                        <p className="w-full mb-1 pl-4 text-error text-sm">{passError}</p>
+                        <p className="w-full mb-1 pl-4 text-error text-sm">{nameError}</p>
                         <input
                             className="w-full"
                             type="text"
@@ -120,7 +121,7 @@ export const RegisterRoute = () => {
                         <p className="pt-4 text-center">
                             By clicking Register, you agree to our{" "}
                             <a
-                                className="text-cyan-400"
+                                className="text-cyan-400 cursor-pointer"
                                 onClick={() => setOpenEula((prev) => !prev)}
                             >
                                 Terms
