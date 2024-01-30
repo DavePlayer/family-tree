@@ -12,9 +12,7 @@ namespace family_tree_API.Services
     public interface IAccountService
     {
         void RegisterUser(RegisterUserDto dto);
-
         string GenerateJwt(LoginDto dto);
-
         Boolean DeleteUser();
         bool validateJWT(string jwt);
     }
@@ -38,7 +36,6 @@ namespace family_tree_API.Services
         {
             var newUser = new User()
             {
-
                 Id = Guid.NewGuid(),
                 EMail = dto.Email,
                 Name = dto.Name,
@@ -51,8 +48,7 @@ namespace family_tree_API.Services
         }
 
         string IAccountService.GenerateJwt(LoginDto dto)
-        {
-            
+        {  
             var user = _context.Users.FirstOrDefault(u => u.EMail == dto.Email);
             if (user == null)
             {
@@ -86,39 +82,33 @@ namespace family_tree_API.Services
             return jwt;
         }
 
-
-
         bool IAccountService.validateJWT(string jwt)
-        {
-            
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var validationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
+        {        
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
 
-                    ValidateIssuer = false, // W zależności od potrzeb można dostosować
-                    ValidateAudience = false, // W zależności od potrzeb można dostosować
-                    ValidIssuer = "issuer",
-                    ValidAudience = "audience",
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("randomowy string do generowania jwt")),
-                };
+                ValidateIssuer = false, // W zależności od potrzeb można dostosować
+                ValidateAudience = false, // W zależności od potrzeb można dostosować
+                ValidIssuer = "issuer",
+                ValidAudience = "audience",
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("randomowy string do generowania jwt")),
+            };
 
-                try
-                {
-                    SecurityToken validatedToken;
-                    var principal = tokenHandler.ValidateToken(jwt, validationParameters, out validatedToken);
-                    return true; // Token jest ważny
-                }
-                catch (Exception ex)
-                {
-                    // Token jest nieważny, obsłuż błąd
-                    Console.WriteLine($"Błąd weryfikacji tokena JWT: {ex.Message}");
-                    return false;
-                }
+            try
+            {
+                SecurityToken validatedToken;
+                var principal = tokenHandler.ValidateToken(jwt, validationParameters, out validatedToken);
+                return true; // Token jest ważny
+            }
+            catch (Exception ex)
+            {
+                // Token jest nieważny, obsłuż błąd
+                Console.WriteLine($"Błąd weryfikacji tokena JWT: {ex.Message}");
+                return false;
+            }
         }
-
-
-
 
         private void deleteFamilyMemberById(String familyMemberId)
         {
@@ -128,6 +118,7 @@ namespace family_tree_API.Services
                 _context.FamilyMembers.Remove(member);
             }
         }
+
         private void deleteConnectionByNodeId(String nodeId)
         {
             List<Connection> connections = _context.Connections.Where(c => (c.To.ToString() == nodeId || c.From.ToString() == nodeId)).ToList();
@@ -136,7 +127,6 @@ namespace family_tree_API.Services
                 _context.Connections.RemoveRange(connections);
             }
         }
-        
 
         private void deleteNodesByTreeId(String treeId)
         {
@@ -179,9 +169,7 @@ namespace family_tree_API.Services
                 }
                 return false;
             }
-
             return false;
         }
-
     }
 }

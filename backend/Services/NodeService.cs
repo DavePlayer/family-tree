@@ -7,16 +7,12 @@ namespace family_tree_API.Services
 {
 
     public interface INodeService {
-
         public Node AddNode(NodeDto dto);
         public Node editNode(NodeDto dto);
-
         public Boolean deleteNode(string node_id);
-
     }
     public class NodeService : INodeService
     {
-
         private readonly FamilyTreeContext _context;
         private readonly IHttpContextAccessor _contextAccessor;
 
@@ -41,10 +37,6 @@ namespace family_tree_API.Services
             Node? node = _context.Nodes.Where(n => n.Id.ToString() == node_id).FirstOrDefault();
             if (node != null)
             {
-                //List<Connection> connection_to_delete = _context.Connections.Where(n => n.From == node.Id && n.To == node.Id).ToList();
-                //foreach (Connection con in connection_to_delete) { 
-                //    _context.Connections.Remove(con);
-                //}
                 deleteConnectionByNodeId(node.Id.ToString());
                 _context.Nodes.Remove(node);
                 _context.SaveChanges();
@@ -59,22 +51,13 @@ namespace family_tree_API.Services
         {
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            //sprawdzenie czy członek rodziny i drzewo należą do osoby dodającej Nod'a
-           /* FamilyMember? famMem = _context.FamilyMembers.Where(m => (m.Id.Equals(dto.FamilyMember))).FirstOrDefault();
-            FamilyTree? famTree = _context.FamilyTrees.Where(t => t.Id == dto.FamilyTree).FirstOrDefault();
-
-            if (famMem == null || !famMem.UserId.ToString().Equals(userId) || famTree == null || !famTree.UserId.ToString().Equals(userId))
-            {
-                throw new BadRequestException("Family tree or family member belongs to other user or does not exist", new Exception());
-            }
-            */
             Node node = new Node()
             {
                 Id = Guid.NewGuid(),
                 PosX = dto.PosX,
                 PosY = dto.PosY
             };
-            //XDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD 
+            
             node.FamilyMember = dto.FamilyMember;
             node.FamilyTree = dto.FamilyTree;
 

@@ -3,29 +3,14 @@ using family_tree_API.Models;
 using System;
 using System.Security.Claims;
 
-//DONE
-//dodawanie drzewa działa
-//usuwanie drzewa po id działa, nie wiem jak nody ktore były do tego drzewa itd
-
-//TO DO
-//zmiana nazwy drzewa
-//nie pozwolenie dwoch drzew o tej samej nazwie (chyba ze ma byc to feature)
-//
-//....
-
-
 namespace family_tree_API.Services
 {
     public interface ITreeService
     {
         FamilyTree AddFamilyTree(FamilyTreeDto dto);
-
         List<FamilyTree> GetUserFamilyTrees();
-
         Boolean DeleteTreeById(String treeId);
-
         FamilyTree editTree(FamilyTreeDto dto);
-
         WholeTree getWholeTree(string treeId);
     }
     public class TreeService : ITreeService
@@ -38,8 +23,6 @@ namespace family_tree_API.Services
             _context = context;
             _contextAccessor = contextAccessor;
         }
-
-
         
         FamilyTree ITreeService.AddFamilyTree(FamilyTreeDto dto)
         {
@@ -58,14 +41,12 @@ namespace family_tree_API.Services
             return tree;
         }
 
-
         List<FamilyTree> ITreeService.GetUserFamilyTrees()
         {
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             List<FamilyTree> UserFamilyTrees = _context.FamilyTrees.Where(tree => tree.UserId.ToString() == userId).ToList();
             return UserFamilyTrees;
         }
-
 
         private void deleteFamilyMemberById(String familyMemberId)
         {
@@ -86,7 +67,6 @@ namespace family_tree_API.Services
             }
         }
 
-
         private void deleteNodesByTreeId(String treeId)
         {
             List<Node> nodes = _context.Nodes.Where(n => n.FamilyTree.ToString() == treeId).ToList();
@@ -101,10 +81,6 @@ namespace family_tree_API.Services
                 }
             }
         }
-
-
-
-
 
         Boolean ITreeService.DeleteTreeById(String treeId)
         {

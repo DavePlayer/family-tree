@@ -25,10 +25,6 @@ internal class StaticFileAuthorizationMiddleware : IMiddleware
                 context.Response.StatusCode = 500;
                 await context.Response.WriteAsync("Something went wrong :/");
                 return;
-            }
-            else {
-
-                 //context.Response.WriteAsync("dziala");
             } 
         }
         await next(context);

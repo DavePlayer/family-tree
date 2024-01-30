@@ -22,12 +22,8 @@ namespace family_tree_API.Controllers
 
         [HttpPost("uploadimage")]
         public async Task<IActionResult> OnPostUploadAsync(IFormFile file)
-        {
-            
-            return Json(await _imageService.Upload(file));
-            
+        {         
+            return Json(await _imageService.Upload(file));          
         }
-
-
     }
 }

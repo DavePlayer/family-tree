@@ -9,13 +9,11 @@ namespace family_tree_API.Services
 
         public Connection AddConnection(ConnectionDto dto);
         public Connection editConnection(ConnectionDto dto);
-
         public Boolean deleteConnection(string connection_id);
     }
 
     public class ConnectionService : IConnectionService
     {
-
         private readonly FamilyTreeContext _context;
         private readonly IHttpContextAccessor _contextAccessor;
 
@@ -50,7 +48,7 @@ namespace family_tree_API.Services
 
             if (famTree == null)
             {
-                throw new BadRequestException("Tee does not exist or it does not belong to this user", new Exception());
+                throw new BadRequestException("Tre does not exist or it does not belong to this user", new Exception());
             }
             if (nodeToId == null || nodeFromId == null)
             {
@@ -75,7 +73,6 @@ namespace family_tree_API.Services
         Connection IConnectionService.editConnection(ConnectionDto dto)
         {
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
             FamilyTree? famTree = _context.FamilyTrees.Where(t => (t.Id == dto.FamilyTreeId && t.UserId.ToString() == userId)).FirstOrDefault();
             Node? nodeToId = _context.Nodes.Where(n => n.Id == dto.To).FirstOrDefault();
             Node? nodeFromId = _context.Nodes.Where(n => n.Id == dto.From).FirstOrDefault();
@@ -105,7 +102,6 @@ namespace family_tree_API.Services
 
             connection.From = dto.From;
             connection.To = dto.To; 
-
 
             _context.Connections.Update(connection);
             _context.SaveChanges();

@@ -25,11 +25,8 @@ namespace family_tree_API.Services
 
         async Task<string> IImageService.Upload(IFormFile file)
         {
-            //TO DO 
-
             string toSaveId = Guid.NewGuid().ToString();
-            // id famili membersa ktory jest w bazie do testow 8e341e16-57ef-42d6-a879-590689f18e2b
-
+            
             var fileExtension = Path.GetExtension(file.FileName);
 
             if (file.Length > 3000000)// if file is greater than 3MB
@@ -45,29 +42,7 @@ namespace family_tree_API.Services
                 return ("Supported: jpg, png");
 
             }
-
-
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            //string userId = "2e3a4178-c4a6-4e66-9ecf-0bbc79d15404"; //only for testing 
-
-            //Wywalone zostało do ID jest generowane i poniższy kod nie ma sensu w takim przypadku
-            /*
-            bool isFamilyMemberAssigned = _context.FamilyMembers
-            .Any(fm => fm.UserId.ToString() == userId && fm.Id.ToString() == toSaveId); // jesli probujemy przypisac zdjecie o id familimembersa lub famili tree ktorych uzytkownik nie jest wlascicielem
-
-            bool isFamilyTreeAssigned = _context.FamilyTrees
-            .Any(ft => ft.UserId.ToString() == userId && ft.Id.ToString() == toSaveId);
-
-            // check that user can upload a image with this id
-            if (!(isFamilyMemberAssigned || isFamilyTreeAssigned))
-            {
-                throw new BadRequestException(
-                    "Can't sign this image to this user, image id: " + toSaveId + " user id: " + userId,
-                    new Exception());
-            }
-
-            */
-            
 
             //Find path
             var fileDirectoryPath = Path.Combine(Environment.CurrentDirectory, @"assets", userId);
@@ -79,21 +54,6 @@ namespace family_tree_API.Services
                 Directory.CreateDirectory(fileDirectoryPath);
             }
 
-            //Wywalone zostało do ID jest generowane i poniższy kod nie ma sensu w takim przypadku
-            /*
-            if (isFamilyTreeAssigned)
-            {
-                await addImageUrlToTrees(toSaveId, @"assets" + "/" + userId + "/" + toSaveId + fileExtension);
-            }
-            else if (isFamilyMemberAssigned)
-            {
-                await addImageUrlToMembers(toSaveId, @"assets" + "/" + userId + "/" + toSaveId + fileExtension);
-            }
-            */
-
-
-
-            // deleting image with diffrent extension than is send
             if (fileExtension == ".png")
             {
                 if (File.Exists(Path.Combine(fileDirectoryPath, toSaveId + ".jpg")))
@@ -168,7 +128,6 @@ namespace family_tree_API.Services
                 // Obsługa przypadku, gdy użytkownik o określonym Id nie istnieje
                 throw new BadRequestException("Saving changes to data base error", new Exception());
             }
-
         }
     }
 }

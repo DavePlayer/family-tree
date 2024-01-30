@@ -90,9 +90,7 @@ namespace family_tree_API.Services
         }
 
         FamilyMember IMemberService.editFamilyMember(FamilyMemberDto dto)
-        {
-
-            
+        {      
             string userId = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             FamilyMember fm = _context.FamilyMembers.Where(f=> f.Id == dto.Id && f.UserId.ToString() == userId ).FirstOrDefault();

@@ -10,7 +10,6 @@ namespace family_tree_API.Controllers
     [Authorize]
     public class TreeController : Controller
     {
-
         private readonly ITreeService _treeService;
 
         public TreeController(ITreeService treeService)
@@ -23,6 +22,7 @@ namespace family_tree_API.Controllers
         {
             return Json(_treeService.GetUserFamilyTrees());
         }
+
         [HttpDelete("deletetree")]
         public IActionResult DeleteTree(String id)
         {
@@ -48,13 +48,13 @@ namespace family_tree_API.Controllers
             return Json(_treeService.editTree(dto));
 
         }
+
         [HttpGet("getwholetree")]
         public IActionResult getWholeTree([FromHeader] string id)
         {
-
             return Json(_treeService.getWholeTree(id));
-
         }
+
         [AllowAnonymous]
         [HttpGet("test")]
         public string Test()

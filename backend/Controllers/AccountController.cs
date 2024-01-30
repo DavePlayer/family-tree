@@ -22,6 +22,7 @@ namespace family_tree_API.Controllers
             _accountService.RegisterUser(dto);
             return Ok();
         }
+
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginDto dto)
         {
