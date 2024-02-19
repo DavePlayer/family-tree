@@ -28,7 +28,7 @@ services:
         environment:
             - ASPNETCORE_ENVIRONMENT=Development
             - ASPNETCORE_URLS=http://+:5000
-            - ASPNETCORE_HTTP_PORT=https//+:5001
+            - ASPNETCORE_HTTP_PORT=https//+:7201
         ports:
             - "5000:5000"
             - "5001:5001"
